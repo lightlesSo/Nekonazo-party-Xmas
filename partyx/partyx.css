@@ -1,0 +1,649 @@
+﻿		#flash,#rooms{
+			overflow:hidden;
+			position:relative;
+			top:2.85vh;
+			margin-bottom:2.85vh;
+			margin-left:auto;
+			margin-right:auto;
+			height:94.3vh; 
+			width:126.18vh;
+			background-image:url("images/bg5.png");
+			background-size:126.18vh 94.3vh;
+			display:none;
+		}
+		#rooms{
+			background:url("images/bgNEKO.png") repeat;
+			background-size: 8%;
+		}
+		.header{
+			z-index:2;
+			height:4.85%;  
+			width:100%;
+			background:url("images/header.png");
+			background-size:100%;
+		}
+		#clock{
+			z-index:3;
+			position:absolute;
+			width:11.7vh;
+			height:11.7vh;
+			left:0.937vh;
+			top:4.85%;
+			background-image:url("images/clock.png");
+			background-size:100%;
+			border-radius:50%;
+		}
+		#clock-num{
+			position: absolute;
+			width: 100%;
+			top: 36%;
+			text-align: center;
+		}
+		#puzzle{			
+			opacity:0.8;
+			z-index:3;
+			position:absolute;
+			left:26.14vh;
+			top:4.85%;
+			width:49.37vh;
+			border-image-slice:10;*/
+			background-image:url("images/puzzle3.png");
+			background-size:100%;
+			border-bottom-right-radius: 2.2vh;
+			border-bottom-left-radius: 2.2vh;
+			height:9.15% ;  //14.4-head;
+			/*height:calc(16.22% - 0.66vh);
+			background-color:white;
+			border:10px  solid ;
+			border-top:none;
+			border-image: radial-gradient(green 60%, red 70%) ;
+			border-image-slice: 10;
+			box-shadow:-0.66vh 0.66vh 0 0 black,
+			0.66vh 0 black,-0.66vh 0 black,
+			0.66vh 0.66vh 0 black,
+			0  0.66vh   black; 一阵操作后选择了抠图,线性渐变只有一个方向,圆形的边够不到,多div实现的话简直坑爹*/ 
+			pointer-events:none;
+
+		}
+		#meiyongpuzzle-text{
+			opacity:0.8;
+			position:absolute;
+			left:3.5%;
+			top:0;
+			width:93%;
+			height:81%;
+			background-size:100%;
+			border-bottom-right-radius: 2.2vh;
+			border-bottom-left-radius: 2.2vh;
+			background-color:red;
+			background:white;
+		}
+		#puzzle-text{
+			position:absolute;
+			width: 100%;
+			text-align: center;
+			top: 22%;
+			font-size: 1em;
+			color: #00b5e5;
+			font-family: sans-serif;
+			font-weight: lighter;
+		}
+		#puzzle-text span{
+			font-size: 1.2em;/*1.04*/
+			color: #5d2191;
+			font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+			font-weight: bold;
+		}
+		
+		#center{
+			position:absolute;
+			z-index:0;
+			top:4.7%;
+			margin-left:0.7%;
+			margin-right:0.7%;
+			height:58.15%;
+			width:98.6%;
+		} 
+		#realboard{
+			position:absolute;
+			z-index:2;
+			margin-left:0.7%;
+			margin-right:0.7%;
+			height:56.7%;
+			width:70.15%;
+			left:1.7%;
+			top:4.85%;
+			border-top-left-radius: 0% 0%;
+			border-top-right-radius:4.15% 66.47%;
+			border-bottom-right-radius: 87.54% 3.7%;
+			border-bottom-left-radius: 12.46% 100% ;
+		}
+		#board{
+			pointer-events:none;
+			z-index:1;
+			position:absolute;
+			top:0;
+			left:0;
+		}
+		#footer{
+			z-index:2;
+			position:absolute;
+			height:37%;
+			//height:35.946%;
+			width:100%;
+			bottom:0;//meiyong;
+			
+		}
+		#items{
+			height:23.1%;
+			width:100%;
+			font-size:0;
+		}
+		.item{   
+			margin-top:0.6%;
+			margin-bottom:0.364%;
+			margin-left:1.456%;
+			margin-right:1.456%;
+			height:88.6%;
+			background-size:100%;
+			width:6.07%;
+			display:inline-block;
+		}
+		#tucao{
+			background-image:url("images/tucao.png");
+		}
+		#tougao{
+			background-image:url("images/tougao.png");
+		}
+		#cunqu{
+			background-image:url("images/cunqu.png");
+		}
+		#haoyou{
+			background-image:url("images/haoyou.png");
+		}
+		#sc{
+			/*49 28 631 581 681 609 50 28 1184 888 53.29 65.43 328.56 */
+			position:absolute;
+			left:53.29%;
+			top:6.56%;
+			width:4.22%;
+			height:8.52%;
+			background-size:100%;
+			background-image:url("images/sc.png");
+		}
+		#characters-and-character{
+			position:absolute;
+			height:76.9%;
+			width:100%;
+			bottom:0;
+		}
+		#characters{
+			position:absolute;
+			height:100%;
+			width:87.8%;
+			font-size:0;
+		}
+		.character{
+			position:relative;
+			display:inline-block;
+			margin:0.415%;//234 723.47   390 443  229 176 24.33%
+		//	width:32.344%;
+			height: 46.59%;
+			background-image:url("images/character.png");
+			width:32.5%;
+			background-size:100% 100%;
+			
+		}
+		.character:before{
+			font-size: medium;
+			position: absolute;
+			color: white;
+			content: attr(data-name);
+			left: 42%;
+			top: 8%;
+			text-shadow:black 1px 1px 0.2em, black -1px -1px 0.2em;
+			font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+		}
+		.character-name{
+			position:absolute;
+			font-size:medium;
+		}
+		.character-img{
+			position: absolute;
+			height: 90%;
+			width: 14%;
+			left: 5.4%;
+			top: 3%;
+		}
+		#right-characters{
+			position:absolute;
+			margin:0.364%;
+			left:87.8%;
+			height:calc(100% - 0.864vh);
+			width:calc(12.2% - 0.864vh);
+			background-image:url("images/party.png");
+			background-size:100% 100%;
+		}
+		#input-box{
+			z-index:7;
+			position:fixed;
+			left:calc(89.7vh + ( 100vw - 126.18vh) / 2);
+			width:36vh;
+			top:65vh;
+			height:4.4vh;
+			background-color:white;
+			border-radius:1.5vh;
+		}
+		#input-text{
+			z-index:1;
+			width:72%;
+			height:100%;
+			border-radius:1.7vh;
+			border:0 solid;
+			outline:none;
+		}
+		#input-button{
+			z-index:3;
+			position:absolute;
+			right:1%;
+			width:27%;
+			height:84%;
+			top:5.5%;;
+			border:none;
+			border-radius:1.9vh;
+			/*background-image:linear-gradient(white,#8a94cc); 为了字体兼容性 用背景图了*/
+			background-image:url("images/text-button.png");
+			background-size:100% 100%;
+			outline:none;
+			box-shadow:0 0.3vh #9ba0ca;
+		}
+		#input-button:active{
+			transform:translatey(0.3vh);
+			box-shadow:none;
+		}
+		#message{
+			z-index:2;
+			position:fixed;
+			right:calc(100vw - (93.12vh + ( 100vw - 126.18vh) / 2) - 32.3vh);
+			top:35.3vh;
+			width:32.3vh;
+			height:29.233%;
+			background-color:white;
+			border:1.5vh solid;
+			border-right:2.2vh solid;
+			border-top:1.1vh solid;
+			border-bottom:1.6vh solid; 
+			border-image-source:url("images/message.png")  ;
+			border-image-width:1.1;
+			border-image-slice:4%;
+			word-wrap:break-word;
+			overflow-x:hidden;
+			overflow-y:scroll;
+			box-sizing: border-box;
+		}
+		#message::-webkit-scrollbar-thumb{
+			background:green;
+			background-image:url("images/scroll.png");
+		}
+		.roomMessageLine{
+		}
+		.roomMessageLine span{
+			color: #95155c;
+			font-weight: bold;
+			font-family: Georgia, serif;		
+		}
+		.roomMessageLine .lname{
+			font-weight: normal;			
+		}
+		#avatar{
+			z-index:2;
+			position:absolute;
+			top:9%;
+			left:81.8%;
+			width:15%;
+			height:19.87%;
+			background-color:white;
+			box-sizing: border-box;
+			padding:0.5vh;
+		}
+		
+		#login{
+			display:none;
+			background: url(images/login.png);
+			background-size: 100%;
+			position: relative;
+			top: 2.85vh;
+			margin-bottom: 2.85vh;
+			margin-left: auto;
+			margin-right: auto;
+			height: 94.3vh;
+			width: 126.18vh;
+		}
+		#login-text{
+			position: absolute;
+			top: 41.5vh;
+			width: 19vh;
+			left: 55vh;
+			height: 1.5em;
+			border: none;
+			outline: none;
+		}
+		#login-button{
+			position: absolute;
+			top: 49.6vh;
+			left: 71.5vh;
+			width: 5vh;
+			height: 1.4em;
+			background: none;
+			outline: none;
+			border: none;
+			cursor: pointer;
+		}
+		#nine-rooms{
+			display:grid;
+			grid-template-columns: 2fr 1fr;
+			grid-auto-rows: 100%;
+			top:4.85%;
+			height: 68%;
+			width: 75%;
+			left: 1.3%;
+			position:absolute;
+			box-sizing:border-box;
+			padding:7% 0.5% 0.7% 0.5%;
+			border-radius: 2vh;
+			background: linear-gradient(rgba(200,250,255,1), rgba(200,250,255,0));
+			border: solid rgb(76,118,142);
+		}
+		#nine-rooms:before{
+			position: absolute;
+			content: "";
+			background: url(images/nine-rooms-header.png)no-repeat;
+			width: 100%;
+			height: 10%;
+			top: 3%;
+			left: 1%;
+			background-size: 100%;
+		}
+		#six-rooms{
+			display:grid;
+			grid-template-columns: 1fr 1fr;
+			grid-auto-rows: 33%;
+			position:relative;
+			overflow-y:auto;
+		}
+		#right-rooms{
+			display:grid;
+			grid-template-columns: 1fr ;
+			grid-template-rows: 2fr 1fr;
+			position:relative;
+		}
+		#create-room{
+			width: 81%;
+			height: 12.5%;
+			position: absolute;
+			left: 9%;
+			top: 78%;
+			border-color: rgb(5,79,126);
+			border-radius: 8px;
+			background: none;
+			outline: none;
+			cursor:pointer;
+		}
+		.room{
+			margin: 2% 0.5% 2% 0.5%;
+			background: url(images/room.png);
+			background-size: 100%;
+			border-radius: 2vh;
+			position:relative;
+			cursor:pointer;
+		}
+		.room:before{
+			pointer-events:none;
+			content:attr(data-id);
+			position: absolute;
+			left: 5%;
+			top: 8%;
+			font-size: xx-large;
+			font-family: Verdana, Geneva, sans-serif;
+			color: rgb(229,140,136);
+			font-weight: bold;
+		}
+		.room:after{
+			pointer-events: none;
+			content: attr(data-roomname);
+			position: absolute;
+			left: 40%;
+			top: 16%;
+			color: rgb(47,113,207);
+		}
+		.room div{
+			pointer-events:none;
+			background: rgba(0,0,0,0);
+			position: absolute;
+			left: 8%;
+			top: 33%;
+			height: 52%;
+			width: 22%;
+		}
+		.room div:before{
+			pointer-events:none;
+			font-family: "Comic Sans MS", cursive, sans-serif;
+			left: 182%;
+			top: 33%;
+			position: absolute;
+			content: attr(data-roomstatus);
+			font-size: 1.6em;
+			color: white;
+			transform: rotate(-15deg);
+		}
+		.room div:after{
+			pointer-events:none;
+			content: attr(data-peoplenum) " / 6";
+			right: -284%;
+			top: 65%;
+			position: absolute;
+			font-size: 1.2em;
+			color: rgb(26,141,136);
+			font-family: Impact, Charcoal, sans-serif;
+		}
+		#room-999 div:before{
+			left: -20%;
+			font-size: x-large;
+		}
+		#room-999 div:after{
+			content: "";
+			height: 72%;
+			right: -240%;
+			width: 161%;
+			top: 38%;
+			background: url(images/kaifangzhong.jpg) no-repeat;
+			background-size: 100%;
+		}
+		#rooms-items{
+			background: url(images/rooms-items.png);
+			background-size: 100%;
+			margin:0.6%;
+			border-radius: 2vh;
+			position:relative;
+		}
+		#rooms-b{
+			position: absolute;
+			background: url(images/rooms-b.png);
+			background-size: 100%;
+			height: 23vh;
+			width: 94vh;
+			left: 1.3%;
+			top: 69.5vh;
+		}
+		#rooms-r{
+			position: absolute;
+			background: url("images/rooms-r.png");
+			background-size: 100%;
+			left: 97.7vh;
+			top: 4.85%;
+			height: 54vh;
+			width: 25.5vh;
+			border-radius: 0.5em;
+		}
+		#rooms-r img{
+			
+		}
+		
+		#rooms-rb{
+			position: absolute;
+			background: url(images/rooms-rb.png);
+			background-size: 100%;
+			height: 34vh;
+			width: 25.5vh;
+			top: 59vh;
+			left: 97.7vh;
+			border-radius: 1em 0em 1em 1em;
+		}
+		#rooms-rb div{
+			margin: 3vh 1vh 2vh 2vh;
+			color: rgb(0,0,23);
+			text-shadow: white 1px 1px 0em, white -1px -1px 0em;
+			font-family: "Comic Sans MS", cursive, sans-serif;
+			overflow-y:auto;
+		}
+		#exitroom{
+			position:absolute;
+			background-image:url("images/exit.png");
+			background-size:100% 100%;
+			right:0.4%;
+			top:0.7%;
+			height:4%;
+			width:5.2%;
+		}
+		#exitroom:active{
+			background:#2969d3;
+		}
+		#drawTimeLimit{
+			position: absolute;
+			right: 25%;
+			top: 0;
+			height: 4%;
+			width: 8%;
+			text-align: right;
+			font-size: x-large;
+			color: #463e60;
+			text-shadow: white -1px 1px 0.1em;
+			font-family: Arial Black, Gadget, sans-serif;
+		}
+		#draw-tool{
+			//display:none;
+		}
+		#brushs{
+			pointer-events:none;
+			position:absolute;
+			left:5vh;
+			top:5vh;
+			padding-top:1.2vh;
+			height:28.8vh;
+			width:7.2vh;
+			z-index:99;
+			background-image:url("images/brushes.jpg");
+			background-size:100%;
+		}
+		#palette{
+			pointer-events:none;
+			position:absolute;
+			right:1vh;
+			top:4.5vh;
+			height:300px;
+			width:300px;
+			z-index:99;
+		}
+		.msg-bubble{
+			z-index:8;
+			font-size:17;
+			padding:13px;
+			width:19vh;
+			word-break: break-all;
+			background: rgba(255,255,255,0.7);
+			position: absolute;
+			border-radius: 13px;
+		}
+		.msg-bubble:before{
+			content: "";
+			width: 0;
+			height: 0;
+			right:78%;
+			bottom: -17px;
+			position: absolute;
+			border-top: 17px solid rgba(255,255,255,0.7);
+			border-right: 17px solid rgba(0,0,0,0);
+			border-left: 0px solid rgba(0,0,0,0);
+		}
+		.ready:after{
+			content:"ready";
+			font-size:x-large;
+			position:absolute;
+			top: 33%;
+			left: 38%;
+			font-family: "Comic Sans MS", cursive, sans-serif;
+			color: white;
+			text-shadow: pink 0 0 0.3em;
+		}
+		.character-img:before{
+			color: red;
+			font-size: small;
+			content: "Neko::";
+			font-family: "Comic Sans MS", cursive, sans-serif;
+			font-weight: bold;
+			position: absolute;
+			left: 130%;
+			top: 9%;
+		}
+		#tips{
+			pointer-events: none;
+			position: absolute;
+			top: 5vh;
+			left: 76vh;
+			width: 8vh;
+			height: auto;
+			word-break: break-all;
+			text-align: center;
+			color: #00b5e5;
+		}
+		#drawing-name{
+			pointer-events: none;
+			position: absolute;
+			top: 37vh;
+			left: 4vh;
+			width: 10vh;
+			word-break: keep-all;
+			text-align: center;
+			color: white;
+			text-shadow: black 1px 1px 0.1em, black -1px -1px 0.1em;
+		}
+		#snow { 
+			position: absolute; 
+			height:100%;
+			width: 100%;
+			max-width: 100%; 
+			top: 0; 
+			overflow: hidden;
+			z-index: 99;
+			pointer-events: none;
+		}
+		#N{
+			position:absolute;
+			height:100%;
+			width:100%;
+			background:white;
+			z-index:999;
+			display:none;
+		}
+		#N div{
+			background:url("images/N.png") no-repeat;
+			background-position:center;
+			height:100%;
+			width:100%;
+			animation:nd 3s;
+			animation-timing-function:linear;
+		}
+		@keyframes nd{
+			from{background-size:10%;}
+			to{background-size:70%;}
+		}

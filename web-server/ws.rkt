@@ -1,0 +1,94 @@
+#lang racket
+(require net/rfc6455)
+(require json)
+(require web-server/http/bindings)
+(require "public-defines.rkt"
+          "closed-proc.rkt" 
+         "message-proc.rkt"
+         "draw-proc.rkt"
+         "game-proc.rkt"
+         "login.rkt"
+        (only-in "account-proc.rkt" account-proc)
+         "room-proc.rkt")
+
+(require web-server/dispatchers/dispatch-files
+          web-server/dispatchers/filesystem-map
+          web-server/web-server
+          web-server/dispatch)
+(define (static-serve static-port file-path)
+	(serve #:dispatch (make #:url->path (make-url->valid-path (make-url->path file-path))
+							#:path->mime-type (lambda (path) (if(string-suffix? (path->string path) ".mp3") 
+																(string->bytes/utf-8 "audio/mpeg")
+																#f))) 
+        #:port static-port))
+
+(define (proc client params)
+  (define name (extract-binding/single 'name params))
+  (let loop ((private-status (list ))) 
+    (let* ((rec (ws-recv client )) 
+          (data (with-handlers ((exn:fail? (lambda(e) rec)))                                        
+                  (begin (string->jsexpr rec))))) 
+    (match data  
+      ((hash-table ('type "account")) (begin (account-proc  name  (hash-remove data 'type)) (loop private-status)))
+      ((hash-table ('type "game") ) (begin (game-proc  name  (hash-remove data 'type)) (loop private-status)))		
+      ((hash-table ('type "draw") ) (begin (draw-proc  name  (hash-remove data 'type)) (loop private-status)))	
+      ((hash-table ('type "message") ) (begin (message-proc  name  (hash-remove data 'type)) (loop private-status)))
+      ((hash-table ('type "room") ) (begin (room-proc  name  (hash-remove data 'type)) (loop private-status)))
+      ("ping" (begin (ws-send! client "pong")
+                     (loop private-status)))
+      ((? eof-object?) (closed-proc name client "timeout")) 
+      (else  (display rec)(loop private-status)))))  
+  )
+(define (origin-proc client params)
+  (define username (extract-binding/single 'username params))
+  (define password (extract-binding/single 'password params))
+  (define host (extract-binding/single 'host params))
+  (define origin (extract-binding/single 'origin params))
+  (if (not (equal? origin host))       
+               
+      (begin (ws-send! client (jsexpr->string
+                                         `#hasheq((type . "account")
+                                                  (type2 . "login")
+                                                  (content . #hasheq((name . "origin-problem")
+                                                                     (status . "not-same-origin"))))))
+             (ws-close! client ))
+      (let ((name (login client `#hasheq((name . ,username)))))
+        (if (void? name)
+            '()
+            (proc client (list (cons 'name name)))))))
+
+(ws-idle-timeout 53)
+
+(define (websocket-serve ws-port static-port)
+(ws-serve
+ #:port ws-port
+ #:listen-ip #f 
+ #:conn-headers
+ (lambda (byte headers req)
+   (define headers (request-headers req))
+   (define bindings (request-bindings req))
+   (define host
+     (string-replace
+      (extract-binding/single 'host headers)
+      (regexp (string-append ":" (number->string ws-port) "$")) ""))
+   (define origin
+     (string-replace
+      (extract-binding/single 'origin headers)
+      (regexp (string-append "^https?://|:" (number->string static-port))) ""))
+   
+   (define username
+     (with-handlers ((exn:fail? (lambda (e) '())))
+     (extract-binding/single 'username bindings)))
+   
+   (define password
+     (with-handlers ((exn:fail? (lambda (e) '())))
+     (extract-binding/single 'username bindings)))
+   (values '() (list (cons 'origin origin)
+                     (cons 'host host)
+                     (cons 'username username)
+                     (cons 'password password)) ))
+ origin-proc))
+;
+(provide websocket-serve static-serve)
+
+

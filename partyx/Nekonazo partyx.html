@@ -1,0 +1,254 @@
+<!-- <!DOCTYPE html> -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN" lang="zh-CN">
+<html>
+	<head>
+	<title>Nekonazo party Xmas!  -- Shimmering Air in Morn --</title>
+	<meta name="generator" content="notepad++ drracket" />
+	<meta name="description" content="-- Shimmering Air in Morn --" />
+	<meta name="robots" content="all" />
+	<meta name="author" content="lightlesSo" />
+	<meta charset="UTF-8">
+	<style type="text/css">
+		*{
+			margin:0;
+			padding:0;
+		}
+		#loading{
+			height:100%;
+			width:100%;
+			background:black;
+			color:white;
+			z-index:999;
+			font-size:52px;
+		}
+		html,body{
+			height:100%;
+			width:100%;
+			
+		}
+		body {
+			margin-left: 0px;
+			margin-top: 1px;
+			margin-right: 0px;
+			margin-bottom: 1px;
+			overflow-y:hidden;
+			background: #ffffff url("images/loop.gif") repeat-y 50% 50%;
+		}
+	</style>
+	</head>
+	<body>
+		<div id="loading"></div>
+		<div id="login">
+			<form id="login-box" action="javascript:;">
+					<input name="name" type="text" id="login-text">
+					</input>
+					<input type="submit" id="login-button" value="   ">				
+					</input>
+				</form>
+		</div>
+		<div id="rooms">
+			<div id="N"><div></div></div>
+			<audio id="bgmusic" autoplay="true" loop preload="auto" src="Merry Xmas! Snow-Ambient.mp3" volume=1 ></audio>
+			<div class="snow-container">
+				<div class="snow foreground"></div>
+				<div class="snow foreground layered"></div>
+				<div class="snow middleground"></div>
+				<div class="snow middleground layered"></div>
+				<div class="snow background"></div>
+				<div class="snow background layered"></div>
+			</div>
+			<div id="snow"></div>
+			<div class="header" ></div>
+			<div id="nine-rooms">
+				<div id="six-rooms">
+					<div id="room-1" class="room" data-id="001">
+						<div ></div>
+					</div>
+					<div id="room-2" class="room" data-id="002">
+						<div ></div>
+					</div>
+				</div>
+				<div id="right-rooms">
+					<div id="rooms-items">
+						<button id="create-room"></button>
+					</div>
+					<div id="room-999" class="room" data-id="999" data-roomname="美工触の练习室">
+						<div data-roomstatus="READY" data-status="开放中~"></div>
+					</div>
+				</div>
+			</div>
+			
+			<div id="rooms-r">
+				<img ></img>
+			</div>
+			<div id="rooms-b">
+			</div>
+			<div id="rooms-rb">
+			<!--	<div style="margin:">
+					<iframe id="OAO"
+						title="OAO"
+						width="300"
+						height="200"
+						src="OAO.html">
+					</iframe>
+				</div> -->
+				<div>
+				</div>
+			</div>
+		</div>
+		<div id="flash">
+			<canvas id="board" width="2000" height="1208">
+					</canvas>
+			<div class="header" >
+				<div id="exitroom">
+				</div>
+				<div id="drawTimeLimit">
+				</div>
+			</div>
+			<div id="clock">
+				<p id="clock-num"></p>
+			</div>
+			<div id="puzzle">
+						<div id="puzzle-text">
+						</div>
+			</div>
+			<div id="tips"></div>
+			<div id="drawing-name"></div>			
+			<div id="realboard" tabindex="0">
+						
+			</div>
+				<form id="input-box" action="javascript:;" draggable="false">
+					<input name="input-text" type="text" id="input-text">
+					</input>
+					<input type="submit" id="input-button" value="">
+				
+					</input>
+				</form>
+				<div id="message" draggable="false">
+				</div>
+
+			<img id="avatar" src="images/avatar.jpg"/>
+			<div id="footer">
+				<div id="items">
+					<div class="item" id="tucao">
+					</div>
+					<div class="item" id="tougao">
+					</div>
+					<div class="item" id="cunqu">
+					</div>
+					<div class="item" id="haoyou">
+					</div>
+				</div>
+				<div id="sc">
+				</div>
+				<div id="characters-and-character">
+					<div id="characters">
+						<div class="character">
+							<p class="character-img"><p> 
+						<!--	<p class="character-name"><p> -->
+						</div>
+						<div class="character">
+							<p class="character-img"><p> 
+						</div>
+						<div class="character">
+							<p class="character-img"><p> 
+						</div>
+						<div class="character">
+							<p class="character-img"><p> 
+						</div>
+						<div class="character">
+							<p class="character-img"><p> 
+						</div>
+						<div class="character">
+							<p class="character-img"><p> 
+						</div>
+					</div>
+					<div id="right-characters">
+					</div>
+				</div>
+			</div>
+			<div id="draw-tool">
+				<div id="brushs">
+				</div>
+				<div id="palette">
+				</div>
+			</div>
+		</div>
+		<script>
+			window.onload=()=>{ 
+				let musics=["Merry Xmas! Snow-Ambient.mp3"];
+				for (let x of musics){
+					let music= new Audio(x);
+					music.oncanplaythrough=load;
+					music.onabort=load;
+					music.onerror=load;
+				}
+				
+				let csses=["partyx.css","dotsnow.css"];
+				for(let x of csses){
+					let css=document.createElement("link");
+					css.rel="stylesheet";
+					css.onload=load;
+					css.onabort=load;
+					css.onerror=load;
+					css.href=x;
+					document.head.appendChild(css);
+				}
+				let images=["images/exit.png","images/scroll.png",
+				"images/message.png","images/text-button.png",
+				"images/bg5.png","images/character.png",
+				"images/clock.png","images/cunqu.png",
+				"images/haoyou.png","images/party.png",
+				"images/puzzle3.png","images/sc.png",
+				"images/tougao.png","images/tucao.png",
+				"images/brushes.jpg","images/bgNEKO.png",
+				"images/kaifangzhong.jpg","images/rooms-items.png",
+				"images/rooms-b.png","images/rooms-r.png","images/rooms-rb.png",
+				"images/header.png","images/nine-rooms-header.png",
+				"images/dotsnow/1.png","images/dotsnow/2.png","images/dotsnow/3.png",
+				"images/snowflake/snowflake1.png","images/snowflake/snowflake2.png",
+				"images/snowflake/snowflake3.png","images/snowflake/snowflake4.png",
+				"images/snowflake/snowflake5.png","images/snowflake/snowflake6.png",
+				"images/snowflake/snowflake7.png","images/N.png","images/login.png",
+				"/images/avatar.jpg"];				
+				for(let x of images){
+					let img=new Image();				
+					img.onload=load;
+					img.onabort=load;
+					img.onerror=load;
+					img.src=x;
+				}
+				let scripts=["config.js","palette.js","flash.js","snow.js","OAO.js"];
+				for(let x of scripts){
+					let script=document.createElement("script");
+					script.onload=load;
+					script.onabort=load;
+					script.onerror=load;
+					script.src=x;
+					document.head.appendChild(script);
+				}
+				let loadingPage=document.getElementById("loading");
+				let n=images.length+scripts.length+csses.length+musics.length;
+				function load(e){
+					n--;
+					console.log(this.outerHTML);
+					loadingPage.innerText=n;
+					if(n<=0){
+						n=1000;
+						loginPage();
+					}
+				}
+				function loginPage(){	
+					let loginPage=document.getElementById("login");
+					loadingPage.style.display="none";
+					loginPage.style.display="block";	
+					let loginBox=document.getElementById("login-box");
+					loginBox.onsubmit=()=>{						
+						flash(loginBox.name.value);
+					};
+				}				
+			}
+
+		</script>
+	</body>
+</html>
