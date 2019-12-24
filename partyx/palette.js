@@ -432,7 +432,7 @@ Palette=function(){
 				let x = event.offsetX;
 				let y = event.offsetY;
 				let eventR=Math.pow(Math.pow(e.offsetX-circleX,2)+Math.pow(e.offsetY-circleY,2),1/2);
-				if(eventR<inR-1){ /
+				if(eventR<inR-1){ 
 					let pixel = ptx.getImageData(x, y, 1, 1);
 					let data = pixel.data;
 					if(!(data[0]===255&&data[1]===255&&data[2]===255)&&e.isTrusted===true){  //反正你也不会到这里找纯白吧
