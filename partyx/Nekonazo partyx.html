@@ -48,7 +48,7 @@
 		</div>
 		<div id="rooms">
 			<div id="N"><div></div></div>
-			<audio id="bgmusic" autoplay="true" loop preload="auto" src="Merry Xmas! Snow-Ambient.mp3" volume=1 ></audio>
+			<audio id="bgmusic"  loop preload="auto" src="Merry Xmas! Snow-Ambient.mp3" volume=1 ></audio> 
 			<div class="snow-container">
 				<div class="snow foreground"></div>
 				<div class="snow foreground layered"></div>
@@ -179,7 +179,12 @@
 				let musics=["Merry Xmas! Snow-Ambient.mp3"];
 				for (let x of musics){
 					let music= new Audio(x);
+					music.loop=true; 
 					music.oncanplaythrough=load;
+					function a(){
+						document.getElementById("rooms").append(music);
+						load();//是可以缓存的
+					};
 					music.onabort=load;
 					music.onerror=load;
 				}
@@ -244,7 +249,7 @@
 					loginPage.style.display="block";	
 					let loginBox=document.getElementById("login-box");
 					loginBox.onsubmit=()=>{						
-						flash(loginBox.name.value);
+						flash(loginBox.name.value===""?"anonymous":loginBox.name.value);
 					};
 				}				
 			}

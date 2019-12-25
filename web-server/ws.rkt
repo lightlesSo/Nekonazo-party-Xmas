@@ -17,9 +17,10 @@
           web-server/dispatch)
 (define (static-serve static-port file-path)
 	(serve #:dispatch (make #:url->path (make-url->valid-path (make-url->path file-path))
-							#:path->mime-type (lambda (path) (if(string-suffix? (path->string path) ".mp3") 
-																(string->bytes/utf-8 "audio/mpeg")
-																#f))) 
+							#:path->mime-type (lambda (path) (cond 
+																((string-suffix? (path->string path) ".mp3") (string->bytes/utf-8 "audio/mpeg"))
+																((string-suffix? (path->string path) ".mp3") (string->bytes/utf-8 "text/css"))
+																(#t #f)))) 
         #:port static-port))
 
 (define (proc client params)

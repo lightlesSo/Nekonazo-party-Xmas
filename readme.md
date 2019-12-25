@@ -51,3 +51,15 @@ racket serve.rkt -h for help
 感谢Archive.org,因为时间久远,搜索引擎的快照已经消失了,幸好这里还保存着大量的记录.
 
 感谢bilibili和之前在这上面上传猫谜绘板视频的人,让我大概知道了游戏是什么样子的,让我可以从截屏取得素材.
+
+刚刚发现,未经允许,不能使用oekakisoli相关的素材,但是nights已经隐身了.还原的话一定要用原版的素材啊,抱歉.
+
+##LICENSE
+
+-----------
+
+asset目录下的words-from-Nekonazo0.json采用GPLv3
+
+partyx/images目录下的文件,partyx/favicon.ico,partyx/Merry Xmas! Snow-Ambient.mp3 不采用许可证
+
+其余部分使用Commons Clause 1.0
