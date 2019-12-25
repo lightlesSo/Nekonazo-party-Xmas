@@ -46,7 +46,7 @@ racket serve.rkt -h for help
 
 ------------
 
-感谢timrockefeller的词典,虽然因为时间问题还没等到你同意,抱歉.如果不可以用的话,我立刻去找其他解决方法.
+感谢timrockefeller的词典.
 
 感谢Archive.org,因为时间久远,搜索引擎的快照已经消失了,幸好这里还保存着大量的记录.
 
