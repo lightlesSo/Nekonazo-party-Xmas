@@ -7,9 +7,13 @@
 (define ws-port (make-parameter 8081))
 (define static-port (make-parameter 80))
 (define file-path (make-parameter "partyx"))
+(define MAX-BYTES (make-parameter "1000"))
+
+
 (command-line
  #:usage-help "run with -f  and -w  if there is no option"
  #:once-each
+ (("-m" "--memory-limit") memory "memory limit bytes" (MAX-BYTES (string->number memory)))
  (("-f" "--file-serve") 
   "run file-server"
   (file-serve? #t))  
@@ -25,6 +29,7 @@
                          (file-path path))
  #:args()
  (begin 
+	(custodian-limit-memory (current-custodian) (MAX-BYTES))
    (if (or (file-serve?)(ws-serve?))
        '()
        (begin (file-serve? #t)
@@ -47,6 +52,7 @@
        ((room-status) (displayln room-status))
        ((ws-pool) (displayln ws-pool)))
      (repl (read)))
+	; (debug-repl)
    (repl (read)) ;or
   ; "test-mode"
    ))
