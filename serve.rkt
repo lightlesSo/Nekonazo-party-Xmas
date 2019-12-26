@@ -7,13 +7,14 @@
 (define ws-port (make-parameter 8081))
 (define static-port (make-parameter 80))
 (define file-path (make-parameter "partyx"))
-(define MAX-BYTES (make-parameter "1000"))
+(define MAX-MBS (make-parameter  250 ))
 
 
 (command-line
  #:usage-help "run with -f  and -w  if there is no option"
  #:once-each
- (("-m" "--memory-limit") memory "memory limit bytes" (MAX-BYTES (string->number memory)))
+ (("-m" "--memory-limit") memory "memory limit mbs default 250mb" (MAX-MBS (string->number memory)))
+ ;(custodian-limit-memory cust (* 50 1024 1024)) 可以设置每个连接的内存限制，防止攻击，估计用不上了
  (("-f" "--file-serve") 
   "run file-server"
   (file-serve? #t))  
@@ -29,7 +30,8 @@
                          (file-path path))
  #:args()
  (begin 
-	(custodian-limit-memory (current-custodian) (MAX-BYTES))
+	(custodian-limit-memory (current-custodian) (* 1024 1024 (MAX-MBS)))
+	(printf "memory limit ~a \n" (MAX-MBS))
    (if (or (file-serve?)(ws-serve?))
        '()
        (begin (file-serve? #t)
