@@ -812,7 +812,7 @@ function flash(name){
 		}
 	}
 	function WebSocketTest(name,port){
-		ws = new WebSocket(`ws://${window.location.hostname}:${port}/?username=${name}`)//;  正式版    
+		ws = new WebSocket(`${PROTOCOL}://${window.location.hostname}:${port}/?username=${name}`)//;  正式版    
 	    ws.onopen = function(evt){
        }; 
        ws.onmessage = function (evt) {
