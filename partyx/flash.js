@@ -135,6 +135,7 @@ function flash(name){
 
 
 		realboard.onpointermove=function(event){
+			//event.preventDefault();
 			ctx.beginPath();
 				if(aLineArray.length>DRAW_PILES){
 					let aLineArrayPointer=aLineArray.length-DRAW_PILES;
@@ -149,7 +150,7 @@ function flash(name){
 					ctx.stroke();
 				}
 			
-		pen.setCtxPressure(ctx,event);
+				pen.setCtxPressure(ctx,event);
 				
 				let step={};
 				currentX=((offsetX+event.offsetX)*widthMul).toFixed(DRAW_DIGITS);
