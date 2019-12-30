@@ -223,7 +223,7 @@ function flash(name){
 					ctx.stroke();
 				}
 				
-				pen.setCtxPressure(ctx,{});
+				pen.setCtxPressure(ctx,drawJsons[pointer]);
 				
 				ctx.lineTo(drawJsons[pointer].endX,drawJsons[pointer].endY);
 				ctx.stroke();
@@ -361,7 +361,7 @@ function flash(name){
 		document.getElementById("draw-tool").style.display="none";
 		document.getElementById("drawTimeLimit").style.display="none";
 		
-		pen.setCtxPressure(ctx,{});
+		//pen.setCtxPressure(ctx,{});
 		[canvas.style.width,canvas.style.height]=
 		[realboard.offsetWidth*2,realboard.offsetHeight*2].map(x=>Math.floor(x));
 		state="room";
@@ -503,7 +503,7 @@ function flash(name){
 			realboard.onpointerdown=drawListener;
 			document.getElementById("drawTimeLimit").style.display="none";				
 			document.getElementById("draw-tool").style.display="block";				
-			pen.setCtxPressure(ctx,{});
+			//pen.setCtxPressure(ctx,{});
 			[canvas.style.width,canvas.style.height]=
 			[realboard.offsetWidth*2,realboard.offsetHeight*2].map(x=>Math.floor(x));
 			state="room";

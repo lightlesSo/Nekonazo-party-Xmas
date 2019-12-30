@@ -626,6 +626,16 @@
 			color: white;
 			text-shadow: black 1px 1px 0.1em, black -1px -1px 0.1em;
 		}
+		#flash{
+			background:none;
+		}
+		#room-bg{
+			position: absolute; 
+			height:100%;
+			width: 100%;
+			background-image:url("images/bg5.png");
+			background-size:100%;
+		}
 		#snow { 
 			position: absolute; 
 			height:100%;
@@ -660,19 +670,19 @@
 		
 		
 		#board {
-			z-index:var(room-zindex1);
+			z-index:1;
 			/*z-index:var(room-zindex4);*/
 		}
-		#bg-img{
-			z-index:var(room-z-index2);
+		#room-bg{
+			z-index:2;
 		}
 		#realboard {
-			z-index:var(room-zindex3);/*4*/
+			z-index:3;/*4*/
 		}
 
 		#avater ,
 		#footer {
-			z-index:var(room-zindex3);
+			z-index:3;
 		}
 		
 		#draw-tool ,		
@@ -683,7 +693,7 @@
 		#drawing-name ,
 		#inputbox ,
 		#message {
-			z-index:var(room-zindex5);
+			z-index:5;
 		}
 		/*
 		1 加bg-img层，中间扣出一块透明 pointer-events none  会导致一些看不见的被画
