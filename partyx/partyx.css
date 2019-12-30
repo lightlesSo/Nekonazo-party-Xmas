@@ -1,4 +1,12 @@
-﻿		#flash,#rooms{
+﻿		:root{
+			room-zindex1:1;
+			room-zindex2:2;
+			room-zindex3:3;
+			room-zindex4:4;
+			room-zindex5:5;
+		}
+		
+		#flash,#rooms{
 			overflow:hidden;
 			position:relative;
 			top:2.85vh;
@@ -124,6 +132,7 @@
 			position:absolute;
 			top:0;
 			left:0;
+			background:white;
 		}
 		#footer{
 			z-index:2;
@@ -647,3 +656,54 @@
 			from{background-size:10%;}
 			to{background-size:70%;}
 		}
+		
+		
+		
+		#board {
+			z-index:var(room-zindex1);
+			/*z-index:var(room-zindex4);*/
+		}
+		#bg-img{
+			z-index:var(room-z-index2);
+		}
+		#realboard {
+			z-index:var(room-zindex3);/*4*/
+		}
+
+		#avater ,
+		#footer {
+			z-index:var(room-zindex3);
+		}
+		
+		#draw-tool ,		
+		#header, 
+		#clock ,
+		#puzzle ,
+		#tips ,
+		#drawing-name ,
+		#inputbox ,
+		#message {
+			z-index:var(room-zindex5);
+		}
+		/*
+		1 加bg-img层，中间扣出一块透明 pointer-events none  会导致一些看不见的被画
+		3 拆分背景
+		4右边占位透明蓝 没用，和bgimg层意义，这样会遮住其他的背景
+		5分真board和监听用的多复杂读，不这样可以把两百年的弧线用divpointerEvents none遮上，不能过大这个div，所以说会有一个 弧的一个右面的占位的更乱把或者放弃弧线
+		6 还是需要背景层不然左边弧线很别扭 还是需要一个真的一个监听的，
+		7放大后是隐藏其他原生还是增大z-index  index方便
+		上层悬浮物
+		(board 扩大)
+		其他 realboard
+		背景 扣一块
+		board 背景为white
+		flash背景为空 不空也盖上了
+		
+		放大需要遮挡的只有footer和右面 剩下的逻辑上也不应该盖上，可以visibility hidden
+		看下视频留哪个
+		8键盘坏了真坑爹
+		9 是扩大监听用board还是把监听改为真正的大画板还是都设上监听切换。按照每次都有加及取消，似乎不用都上，可以给后面的板设事件，不去想小的，因为会被盖上
+		扩大范围要改两个元素，还是直接切换把，切换realboard可行，但是那只有再开始游戏是游泳，所以不这样。先找现改把
+		10监听函数的realboard改为this，可以上面两个方法都行把，初始化之类切换什么会很麻烦 大概 被画的是根据画的人隐藏那些还是自己隐藏呢 按自己隐藏处理把 方便 不用传输，也似乎符合逻辑
+		
+		*/

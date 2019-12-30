@@ -234,7 +234,9 @@ Palette=function(){
 			setCtxPressure:function(ctx,pointerEvent){  //发送时可以人工合成一个pointerEvent{} 绘画时也用这个也行 只需要有压力种类属性就行,或者可以加夹角旋转切向力
 				ctx.strokeStyle=pen.styles.strokeStyle;
 				if(pointerEvent.pointerType==="pen"){
-					ctx.globalAlpha=pointerEvent.pressure*pen.styles.globalAlpha;//pressure
+					ctx.globalAlpha=2*pointerEvent.pressure*pen.styles.globalAlpha;//pressure
+					ctx.lineWidth=2*pointerEvent.pressure*pen.styles.lineWidth;
+					ctx.shadowBlur=2*pointerEvent.pressure*pen.styles.shadowBlur;
 				}
 				else{
 				}

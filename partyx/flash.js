@@ -85,6 +85,7 @@ function flash(name){
 		event.preventDefault();
 		let heightMul=canvasHeight/canvas.offsetHeight;
 		let widthMul=canvasWidth/canvas.offsetWidth;
+		let realboard=this;
 		let [offsetX,offsetY]=[realboard.offsetLeft-canvas.offsetLeft,realboard.offsetTop-canvas.offsetTop];
 		let currentX=((offsetX+event.offsetX)*widthMul).toFixed(DRAW_DIGITS);
 		let currentY=((offsetY+event.offsetY)*heightMul).toFixed(DRAW_DIGITS);
@@ -102,6 +103,8 @@ function flash(name){
 				ctx.lineTo(currentX,currentY);
 				step.endX=currentX;
 				step.endY=currentY;
+				step.pressure=event.pressure;
+				step.pointerType=event.pointerType;
 				ctx.stroke(); 
 				lineSteps.push(step);
 				aLineArray.push({x:currentX,y:currentY});
@@ -154,6 +157,8 @@ function flash(name){
 				ctx.lineTo(currentX,currentY);
 				step.endX=currentX;
 				step.endY=currentY;
+				step.pointerType=event.pointerType;
+				step.pressure=event.pressure;
 				ctx.stroke(); 
 				lineSteps.push(step);
 				aLineArray.push({x:currentX,y:currentY});
