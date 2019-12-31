@@ -19,7 +19,7 @@
 	(serve #:dispatch (make #:url->path (make-url->valid-path (make-url->path file-path))
 							#:path->mime-type (lambda (path) (cond 
 																((string-suffix? (path->string path) ".mp3") (string->bytes/utf-8 "audio/mpeg"))
-																((string-suffix? (path->string path) ".mp3") (string->bytes/utf-8 "text/css"))
+																((string-suffix? (path->string path) ".css") (string->bytes/utf-8 "text/css"))
 																(#t #f)))) 
         #:port static-port))
 
