@@ -24,6 +24,7 @@
 			background-size: 8%;
 		}
 		.header{
+			position: absolute;
 			z-index:2;
 			height:4.85%;  
 			width:100%;
@@ -193,6 +194,7 @@
 			font-size:0;
 		}
 		.character{
+			cursor: pointer;
 			position:relative;
 			display:inline-block;
 			margin:0.415%;//234 723.47   390 443  229 176 24.33%
@@ -252,6 +254,7 @@
 			outline:none;
 		}
 		#input-button{
+			cursor: pointer;
 			z-index:3;
 			position:absolute;
 			right:1%;
@@ -516,12 +519,13 @@
 			overflow-y:auto;
 		}
 		#exitroom{
+			cursor: pointer;
 			position:absolute;
 			background-image:url("images/exit.png");
 			background-size:100% 100%;
 			right:0.4%;
-			top:0.7%;
-			height:4%;
+			top:14.5%;
+			height:82.5%;
 			width:5.2%;
 		}
 		#exitroom:active{
@@ -531,7 +535,7 @@
 			position: absolute;
 			right: 25%;
 			top: 0;
-			height: 4%;
+			height:82.5%;
 			width: 8%;
 			text-align: right;
 			font-size: x-large;
@@ -626,6 +630,16 @@
 			color: white;
 			text-shadow: black 1px 1px 0.1em, black -1px -1px 0.1em;
 		}
+		#flash{
+			background:none;
+		}
+		#room-bg{
+			position: absolute; 
+			height:100%;
+			width: 100%;
+			background-image:url("images/bg5.png");
+			background-size:100%;
+		}
 		#snow { 
 			position: absolute; 
 			height:100%;
@@ -660,30 +674,31 @@
 		
 		
 		#board {
-			z-index:var(room-zindex1);
+			z-index:1;
 			/*z-index:var(room-zindex4);*/
 		}
-		#bg-img{
-			z-index:var(room-z-index2);
+		#room-bg{
+			z-index:2;
 		}
 		#realboard {
-			z-index:var(room-zindex3);/*4*/
+			z-index:3;/*4*/
 		}
 
 		#avater ,
 		#footer {
-			z-index:var(room-zindex3);
+			z-index:3;
 		}
 		
-		#draw-tool ,		
-		#header, 
+		#draw-tool ,
+		#exitroom,		
+		.header, 
 		#clock ,
 		#puzzle ,
 		#tips ,
 		#drawing-name ,
 		#inputbox ,
 		#message {
-			z-index:var(room-zindex5);
+			z-index:5;
 		}
 		/*
 		1 加bg-img层，中间扣出一块透明 pointer-events none  会导致一些看不见的被画
