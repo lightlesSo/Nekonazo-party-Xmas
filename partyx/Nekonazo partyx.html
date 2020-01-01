@@ -48,7 +48,7 @@
 		</div>
 		<div id="rooms">
 			<div id="N"><div></div></div>
-			<audio id="bgmusic"  loop preload="auto" src="Merry Xmas! Snow-Ambient.mp3" volume=1 ></audio> 
+		<!--	<audio id="bgmusic"  loop preload="auto" src="Merry Xmas! Snow-Ambient.mp3" volume=1 ></audio>  -->
 			<div class="snow-container">
 				<div class="snow foreground"></div>
 				<div class="snow foreground layered"></div>
@@ -176,15 +176,17 @@
 		</div>
 		<script>
 			window.onload=()=>{ 
-				let musics=["Merry Xmas! Snow-Ambient.mp3"];
+				let musics=[{id:"bgmusic",url:"Merry Xmas! Snow-Ambient.mp3"}];
 				for (let x of musics){
-					let music= new Audio(x);
+					let music= new Audio(x.url);
 					music.loop=true; 
+					music.id=x.id;
 					music.oncanplaythrough=load;
-					function a(){
+				//	function a(){
 						document.getElementById("rooms").append(music);
-						load();//是可以缓存的
-					};
+					//	load();//是可以缓存的
+				//	};
+					a();
 					music.onabort=load;
 					music.onerror=load;
 				}
