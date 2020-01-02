@@ -431,14 +431,19 @@ function flash(name){
 			}
 		}
 	}
-	/*
+	
 	function getCurrentRoomsOnce(delay){
-		setTimeout(function(){
+		if(undefined===delay){
 			ws.send(JSON.stringify({type:"room",type2:"getcurrentrooms",content:{}}));
-		},delay);
+		}
+		else{
+			setTimeout(function(){
+				ws.send(JSON.stringify({type:"room",type2:"getcurrentrooms",content:{}}));
+			},delay);
+		}
 		
 	}
-	function getCurrentRooms(){
+	/*function getCurrentRooms(){
 		
 		if(state!=="rooms")
 			return;
@@ -478,7 +483,7 @@ function flash(name){
 			set.className="character"; 
 		}
 		document.getElementById("flash").style.display="none";
-		document.getElementById("login").style.display="none";
+	//	document.getElementById("login").style.display="none";
 		document.getElementById("rooms").style.display="block";
 		state="rooms";
 		document.getElementById("bgmusic").play();
@@ -493,7 +498,7 @@ function flash(name){
 		}	
 		document.getElementById("room-999").onclick=function(e){	
 			
-			document.getElementById("login").style.display="none";
+	//		document.getElementById("login").style.display="none";
 			document.getElementById("rooms").style.display="none";
 			document.getElementById("flash").style.display="block";
 			document.getElementById("bgmusic").pause();
@@ -546,6 +551,7 @@ function flash(name){
 		}
 		document.getElementById("create-room").onclick=createRoom;
 		//getCurrentRooms();
+		getCurrentRoomsOnce();
 	}
 	function inoutRoom(content){
 		if(state==="room"){
@@ -675,8 +681,12 @@ function flash(name){
 			document.getElementById("N").style.display="block";
 			setTimeout(function(){
 				document.getElementById("N").style.display="none";
-			},2000);
+			},1800);
 			document.getElementById("rooms-rb").firstElementChild.innerText=OAO;
+			document.getElementById("login").style.opacity=0;
+			setTimeout(function(){
+				document.getElementById("login").style.display="none";
+			},700);
 			toRooms();
 		
 		}
@@ -774,6 +784,7 @@ function flash(name){
 				});
 			}
 		}
+		//console.log(state)
 		if(state==="rooms"){
 			refreshRooms();					
 		}
@@ -825,8 +836,10 @@ function flash(name){
        }; 
        ws.onmessage = function (evt) {
 		   let rec;
+		//   console.log(evt.data)
 		   try{
 				rec = JSON.parse(evt.data);
+				
 				switch(rec.type){
 				case "account":
 					switch(rec.type2){
@@ -905,7 +918,7 @@ function flash(name){
 				   break;
 			   }
 		   }
-		  
+		 // console.log(rec);
 			
        };               
        ws.onclose = function(){ 

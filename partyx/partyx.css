@@ -320,16 +320,18 @@
 		}
 		
 		#login{
+			z-index:1111;
 			display:none;
 			background: url(images/login.png);
 			background-size: 100%;
-			position: relative;
+			position: absolute;
 			top: 2.85vh;
 			margin-bottom: 2.85vh;
 			margin-left: auto;
 			margin-right: auto;
 			height: 94.3vh;
 			width: 126.18vh;
+			transition: 0.8s;
 		}
 		#login-text{
 			position: absolute;
@@ -657,20 +659,27 @@
 			background:white;
 			z-index:999;
 			display:none;
+			animation:nalpha 0.5s 1.5s 1 both;
+			animation-timing-function:ease-in;
 		}
 		#N div{
 			background:url("images/N.png") no-repeat;
 			background-position:center;
 			height:100%;
 			width:100%;
-			animation:nd 3s;
-			animation-timing-function:linear;
+			animation:nd 0.6s 0.6s 1 both;
+			animation-timing-function:ease-in;
 		}
 		@keyframes nd{
-			from{background-size:10%;}
-			to{background-size:70%;}
+			0%{background-size:0;}
+			55%{opacity:1;}
+			88%{background-size:90%;opacity:0.1;}
+			100%{background-size:100%;opacity:0;}
 		}
-		
+		@keyframes nalpha{
+			from{opacity:1;background:white;}
+			to{opacity:0}
+		}
 		
 		
 		#board {
