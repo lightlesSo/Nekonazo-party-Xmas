@@ -326,9 +326,11 @@
 			background-size: 100%;
 			position: absolute;
 			top: 2.85vh;
-			margin-bottom: 2.85vh;
+		/*	margin-bottom: 2.85vh;
 			margin-left: auto;
-			margin-right: auto;
+			margin-right: auto;*/
+			left: 50%; 
+			transform:translatex(-50%);
 			height: 94.3vh;
 			width: 126.18vh;
 			transition: 0.8s;

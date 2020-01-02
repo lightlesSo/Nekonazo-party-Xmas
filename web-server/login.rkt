@@ -32,7 +32,7 @@
                     (ws-close! client)
                    )
               (begin (hash-set! ws-pool name client)
-                     (hash-set! name-status name #hasheq((state . "rooms")))
+                     (hash-set! name-status name (make-hash '((state . "rooms"))))
                    (ws-send! client (jsexpr->string
                                      `#hasheq((type . "account")
                                               (type2 . "login")

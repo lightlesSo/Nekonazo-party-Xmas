@@ -9,7 +9,7 @@
 	"关闭时关闭连接，在ws-pool里删去记录"
   (begin
     (ws-close! client)
-    (if (hash-has-key? (hash-ref name-status name) 'room)
+    (if (and (hash-has-key? (hash-ref name-status name) 'room)(not (equal? "notroom"(hash-ref (hash-ref name-status name) 'room))))
 		 (exit-room name '())
         '())
    

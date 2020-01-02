@@ -58,7 +58,7 @@
                          ((hash-table ('type "room") ) (begin (room-proc  name  (hash-remove data 'type)) ))
                          ("ping" (begin (ws-send! client "pong")
                                         ))
-                         ((? eof-object?) (begin (closed-proc name client "timeout")(close))) 
+                         ((? eof-object?) (begin (closed-proc name client "timeout")(close "logout"))) 
                          (else  (display rec)))))))
         (loop private-status)))  )
   )

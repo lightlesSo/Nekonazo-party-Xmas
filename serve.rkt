@@ -56,6 +56,6 @@
        ((ws-pool) (displayln ws-pool)))
      (repl (read)))
 	; (debug-repl)
-   (repl (read)) ;or
-  ; "test-mode"
+  ; (repl (read)) ;or
+   "test-mode"
    ))
