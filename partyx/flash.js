@@ -681,14 +681,15 @@ function flash(name){
 			document.getElementById("N").style.display="block";
 			setTimeout(function(){
 				document.getElementById("N").style.display="none";
-			},1800);
+			},2000);
 			document.getElementById("rooms-rb").firstElementChild.innerText=OAO;
 			document.getElementById("login").style.opacity=0;
 			setTimeout(function(){
 				document.getElementById("login").style.display="none";
 			},700);
-			toRooms();
-		
+			setTimeout(function(){
+				toRooms();
+			},1500);
 		}
 		else if(content.status==="duplicate"&&state==="login"){
 			console.log("duplicate");

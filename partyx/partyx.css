@@ -325,35 +325,38 @@
 			background: url(images/login.png);
 			background-size: 100%;
 			position: absolute;
-			top: 2.85vh;
+			top: 50%;
 		/*	margin-bottom: 2.85vh;
 			margin-left: auto;
 			margin-right: auto;*/
 			left: 50%; 
-			transform:translatex(-50%);
-			height: 94.3vh;
-			width: 126.18vh;
+			transform:translate(-50%,-50%);
+			height: 70vh;
+			width: 93.7vh;
 			transition: 0.8s;
 		}
 		#login-text{
 			position: absolute;
-			top: 41.5vh;
-			width: 19vh;
-			left: 55vh;
+			top: 44%;
+			width: 15%;
+			left: 43.5%;
 			height: 1.5em;
 			border: none;
 			outline: none;
 		}
 		#login-button{
 			position: absolute;
-			top: 49.6vh;
-			left: 71.5vh;
-			width: 5vh;
+			top: 52.5%;
+			left: 56.5%;
+			width: 4%;
 			height: 1.4em;
 			background: none;
 			outline: none;
 			border: none;
 			cursor: pointer;
+		}
+		#login-button:hover{
+			background:rgba(255,255,255,0.2);
 		}
 		#nine-rooms{
 			display:grid;
@@ -656,12 +659,15 @@
 		}
 		#N{
 			position:absolute;
-			height:100%;
-			width:100%;
+			top: 50%;
+			left: 50%; 
+			transform:translate(-50%,-50%);
+			height: 70vh;
+			width: 93.7vh;
 			background:white;
 			z-index:999;
 			display:none;
-			animation:nalpha 0.5s 1.5s 1 both;
+			animation:nalpha 0.5s 1.4s 1 forwards;
 			animation-timing-function:ease-in;
 		}
 		#N div{
@@ -679,9 +685,12 @@
 			100%{background-size:100%;opacity:0;}
 		}
 		@keyframes nalpha{
-			from{opacity:1;background:white;}
-			to{opacity:0}
+			0%{height:94.3vh; 
+			width:126.18vh;opacity:1;background:white;}
+			100%{height:94.3vh; 
+			width:126.18vh;opacity:0;}
 		}
+		
 		
 		
 		#board {
