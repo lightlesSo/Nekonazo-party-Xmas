@@ -28,7 +28,7 @@
                      (ws-port (string->number port)) )
  (("-s" "--static-path") path "static-file-path ; partyx is default"
                          (file-path path))
-  (("-l" "--use-wss") "use wss protocol not ws" (ws-protocol "wss"))
+  (("-l" "--use-wss") "use wss protocol not ws" (ws-protocol "wss"));应该由用吧，相对文本配置
  #:args()
  (begin 
 	(custodian-limit-memory (current-custodian) (* 1024 1024 (MAX-MBS)))

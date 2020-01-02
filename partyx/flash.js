@@ -431,6 +431,7 @@ function flash(name){
 			}
 		}
 	}
+	/*
 	function getCurrentRoomsOnce(delay){
 		setTimeout(function(){
 			ws.send(JSON.stringify({type:"room",type2:"getcurrentrooms",content:{}}));
@@ -445,7 +446,8 @@ function flash(name){
 		setTimeout(function(){					
 			getCurrentRooms();
 		},GET_ROOMS_INTERVAL)
-	}
+	} 大概没用了
+	*/
 	function snow(snowDiv){
 		let realInterval;
 		function realSnowOnce(){
@@ -522,9 +524,9 @@ function flash(name){
 			this.style.pointerEvents="none";
 			sixRooms.style.pointerEvents="none";
 			let button=this;
-			getCurrentRoomsOnce(500);
+		//	getCurrentRoomsOnce(500);
 			function proc(){
-				timeout=timeout-200;
+				timeout=timeout-100;
 				if(timeout<0){
 					button.style.pointerEvents="auto";
 					sixRooms.style.pointerEvents="auto";
@@ -532,7 +534,7 @@ function flash(name){
 				}
 				let newRoom=document.getElementById(roomToId(newRoomName));
 				if(newRoom===null){
-					setTimeout(proc,200);
+					setTimeout(proc,100);
 				}
 				else if(state==="rooms"){
 					button.style.pointerEvents="auto";
@@ -543,7 +545,7 @@ function flash(name){
 			proc();
 		}
 		document.getElementById("create-room").onclick=createRoom;
-		getCurrentRooms();
+		//getCurrentRooms();
 	}
 	function inoutRoom(content){
 		if(state==="room"){
@@ -778,7 +780,7 @@ function flash(name){
 		else {
 			let timeout=WAIT_TIMEOUT;
 			function waitToRooms(){
-				timeout=timeout-200;
+				timeout=timeout-100;
 				if(timeout<0){
 					return;
 				}
@@ -786,7 +788,7 @@ function flash(name){
 					refreshRooms();
 				}
 				else{
-					setTimeout(waitToRooms,200);
+					setTimeout(waitToRooms,100);
 				}
 			}
 			waitToRooms();

@@ -59,4 +59,11 @@
   (define roomsstatus (hash-map  room-status oneroomstatus))
   ;racket 在key为数字时 jsexpr->string会失效
   (send-json name "room" "currentrooms" `#hasheq((roomlist . ,roomsstatus))))
+(define (obs-hash hashtable fun proc)
+	"hashtable在fun执行后如果变化，就执行proc"
+	(define old-hash-code (equal-hash-code hashtable))
+	(begin (fun)
+	(if (equal? old-hash-code (equal-hash-code hashtable))
+	(void)
+	(proc))))
 (provide (all-defined-out))

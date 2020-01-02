@@ -22,14 +22,29 @@
 																((string-suffix? (path->string path) ".css") (string->bytes/utf-8 "text/css"))
 																(#t #f)))) 
         #:port static-port))
-
+(define (broadcast-if-room-status-modify fun) 
+  (define rooms-namelist 
+	(filter string?
+		(hash-map name-status 
+		  (lambda (key value) 
+			(if (equal? "rooms" (hash-ref value 'state '()))
+				key
+				'())))))
+  (define (oneroomstatus key value)
+	  (make-hash (list (cons 'room key) 
+	(cons 'peoplenum (length (hash-ref value 'names)))	  
+	(cons 'roomstatus (hash-ref value 'gamestate)))))
+  (define roomsstatus (hash-map  room-status oneroomstatus))
+(obs-hash room-status fun (broadcast-json rooms-namelist "room" "currentrooms" roomsstatus )))
 (define (proc client params)
-  (define name (extract-binding/single 'name params))
+  (define name (extract-binding/single 'name params))  
   (let loop ((private-status (list ))) 
     (let* ((rec (ws-recv client )) 
           (data (with-handlers ((exn:fail? (lambda(e) rec)))                                        
                   (begin (string->jsexpr rec))))) 
-    (match data  
+    (broadcast-if-room-status-modify
+	(thunk
+	(match data  
       ((hash-table ('type "account")) (begin (account-proc  name  (hash-remove data 'type)) (loop private-status)))
       ((hash-table ('type "game") ) (begin (game-proc  name  (hash-remove data 'type)) (loop private-status)))		
       ((hash-table ('type "draw") ) (begin (draw-proc  name  (hash-remove data 'type)) (loop private-status)))	
@@ -38,7 +53,7 @@
       ("ping" (begin (ws-send! client "pong")
                      (loop private-status)))
       ((? eof-object?) (closed-proc name client "timeout")) 
-      (else  (display rec)(loop private-status)))))  
+      (else  (display rec)(loop private-status)))))))  
   )
 (define (origin-proc client params)
   (define username (extract-binding/single 'username params))
