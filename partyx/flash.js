@@ -3,6 +3,7 @@ function flash(name){
 	window.onpointerdown===undefined?
 	["mousedown","mouseup","mousemove","mouseleave","onmousedown","onmouseup","onmousemove","onmouseleave"]:
 	["pointerdown","pointerup","pointermove","pointerleave","onpointerdown","onpointerup","onpointermove","onpointerleave"];
+	//这真的有用吗，我是不是用了一些比pointer兼容性还差的东西
 
 	const PING_INTERVAL=38000;
 	const PING_TIMEOUT=15000;
@@ -843,9 +844,10 @@ function flash(name){
        ws.onmessage = function (evt) {
 		   let rec;
 		//   console.log(evt.data)
+		
 		   try{
 				rec = JSON.parse(evt.data);
-				
+			//虽然这样比try{ obj[rec.type2](rec.content);}麻烦多了，但是看起来清楚
 				switch(rec.type){
 				case "account":
 					switch(rec.type2){

@@ -4,15 +4,32 @@
 (require web-server/private/timer)
 (define nazo-words-list (list->vector (string->jsexpr (file->string "asset/words-from-Nekonazo0.json"))))
 (define nazo-words-list-length (vector-length  nazo-words-list))
-(define ws-pool (make-hash))
-(define name-status (make-hash)); (name #hasheq((dsf . df)(.))
-(define room-status (make-hash)); (room #hasheq((drawsteps . df)(room . '(name name))(.))
-(hash-set! room-status "1" (make-hash '((names . ())(drawsteps . ())(gamestate . "ready")))) ;;测试用
-(hash-set! room-status "2" (make-hash '((names . ())(drawsteps . ())(gamestate . "ready"))))
-(define (name->client name (fail "meiyou"))
+(define ws-pool (make-immutable-hasheq))
+(define name-status (make-immutable-hasheq)); (name #hasheq((dsf . df)(.))
+(define room-status (make-immutable-hasheq)); (room #hasheq((drawsteps . df)(room . '(name name))(.))
+(define root (make-hasheq (list (cons 'ws-pool ws-pool)( cons 'name-status name-status)(cons 'room-status room-status))))
+;parameter是线程私有的
+(define ws-pool 
+	(case-lambda (() (hash-ref root 'ws-pool))
+				((new-data) (hash-set! root 'ws-pool new-data)))
+				#;((k v ) (ws-pool (hash-set (ws-pool) k v)))
+				#;((k v fail) (ws-pool (hash-set (ws-pool) k v fail)));有用吗，对于更深层嵌套也没用 update也没有 就算有update 可以#: 深层也没法处理 还有remove 别了，反而会混乱，虽说能少些几个字
+				)
+(define room-status 
+	(case-lambda (() (hash-ref root 'room-status ))
+				((new-data) (hash-set! root 'room-status  new-data))))
+(define name-status 
+	(case-lambda (() (hash-ref root 'name-status))
+				((new-data) (hash-set! root 'name-status new-data))))
+(room-status (hash-set (room-status) "1" (make-hash '((names . ())(drawsteps . ())(gamestate . "ready"))))) ;;测试用
+(room-status (hash-set (room-status) "2" (make-hash '((names . ())(drawsteps . ())(gamestate . "ready")))))
+#;(define (name->client name (fail "meiyou"))
   (if (equal? fail "meiyou")
       (hash-ref ws-pool name)
       (hash-ref ws-pool name fail)))
+(define name->client 
+	(case-lambda ((name)(hash-ref (ws-pool) name))
+		((name fail)(hash-ref (ws-pool) name fail))));这些都应该不要，但是这个可以作为一个例外 只是为了找到唯一对应关系
 (define (room->namelist room (fail "meiyou"))
   (if (equal? fail "meiyou")
       (hash-ref (hash-ref room-status room ) 'names )
