@@ -21,6 +21,10 @@ return proxy:{
 Palette=function(){
 	const ALPHACIRCLE=3.5;
 	const ALPHAACCURACY=0.01;
+	const [downEvent,upEvent,moveEvent,leaveEvent,onDown,onUp,onMove,onLeave]=
+	window.onpointerdown===undefined?
+	["mousedown","mouseup","mousemove","mouseleave","onmousedown","onmouseup","onmousemove","onmouseleave"]:
+	["pointerdown","pointerup","pointermove","pointerleave","onpointerdown","onpointerup","onpointermove","onpointerleave"];
 	function realAlpha(requiredAlpha,plies,accuracy){
 		function mixAlpha(plies,alpha,mix){
 			if(plies===0)
@@ -183,19 +187,19 @@ Palette=function(){
 						obj.styles.lineWidth=brushData[obj.brush].lineAddShadowWidth*(1-obj.blurProportion);
 						obj.styles.shadowBlur=brushData[obj.brush].lineAddShadowWidth*obj.blurProportion;
 						alpha.children[1].style.top=brushData[obj.brush].alpha*alpha.offsetHeight-ALPHACIRCLE;
-						blurs.selected.style.boxShadow="";
+						blurs_selected.style.boxShadow="";
 						for (let x of blurs.children){
 							if (x.dataNum===brushData[obj.brush].blurProportion){
-								blurs.selected=x;
+								blurs_selected=x;
 								x.style.boxShadow="inset 0 0 0 0.15em red";
 								blurs.scrollTop=x.offsetTop-2*x.offsetHeight;
 								break;
 							}
 						} 
-						thicknesses.selected.style.boxShadow="";
+						thicknesses_selected.style.boxShadow="";
 						for (let x of thicknesses.children){
 							if (x.dataNum===brushData[obj.brush].lineAddShadowWidth){
-								thicknesses.selected=x;
+								thicknesses_selected=x;
 								x.style.boxShadow="inset 0 0 0 0.15em red";
 								thicknesses.scrollTop=x.offsetTop-2*x.offsetHeight;
 								break;
@@ -252,12 +256,12 @@ Palette=function(){
 			}
 		}
 		function setBackground(source){ 
-			if(paletteCircleContainer.rgb.R!==pen.rgb.R||
-			paletteCircleContainer.rgb.B!==pen.rgb.B||
-			paletteCircleContainer.rgb.G!==pen.rgb.G){
+			if(paletteCircleContainer_rgb.R!==pen.rgb.R||
+			paletteCircleContainer_rgb.B!==pen.rgb.B||
+			paletteCircleContainer_rgb.G!==pen.rgb.G){
 					let hsl=rgbToHsl(pen.rgb.R,pen.rgb.G,pen.rgb.B);
 					let circleX=circleW/2,circleY=circleH/2,inR=circleW*0.35,R=circleW*0.4;
-					let e=new Event('mousedown');
+					let e=new Event(downEvent);
 					let angle=Math.PI/180;
 					e.offsetX=circleX;
 					e.offsetY=circleY-R;
@@ -271,13 +275,13 @@ Palette=function(){
 					e.offsetY=circleY-R*Math.cos(angle*hsl.H);
 					e.offsetX=circleX+R*Math.sin(angle*hsl.H);
 					paletteCircleContainer.children[0].dispatchEvent(e);
-					paletteCircleContainer.children[0].dispatchEvent(new Event('mouseup'));
+					paletteCircleContainer.children[0].dispatchEvent(new Event(upEvent));
 					
 				}
 			
 				let rgb = 'rgb(' + pen.rgb.R+ ',' + pen.rgb.G +
 							 ',' + pen.rgb.B+')';
-				selectedColors.leftSelected.style.backgroundColor=rgb;
+				selectedColors_leftSelected.style.backgroundColor=rgb;
 				alpha.firstChild.style.background=" linear-gradient(to bottom, rgba("+pen.rgb.R+", "+pen.rgb.G+", "+pen.rgb.B+", 0) 0%, rgb("+pen.rgb.R+", "+pen.rgb.G+", "+pen.rgb.B+") 100%)";
 			
 		}
@@ -290,7 +294,7 @@ Palette=function(){
 
 		
 		let paletteCircleContainer=document.createElement("div");
-		paletteCircleContainer.rgb={R:255,G:0,B:0};
+		let paletteCircleContainer_rgb={R:255,G:0,B:0};
 		(function(){
 			let paletteCircle=document.createElement("canvas");
 			paletteCircle.width=circleW;
@@ -398,7 +402,7 @@ Palette=function(){
 						let pixel = ptx.getImageData(Rx, Ry, 1, 1);
 						let data = pixel.data;
 						if(!(data[0]===255&&data[1]===255&&data[2]===255)&&e.isTrusted===true){  
-							paletteCircleContainer.rgb={R:data[0],G:data[1],B:data[2]};
+							paletteCircleContainer_rgb={R:data[0],G:data[1],B:data[2]};
 							pen.rgb={R:data[0],G:data[1],B:data[2]};
 						}
 					}
@@ -406,29 +410,29 @@ Palette=function(){
 
 				}
 				else if(eventR<inR+1){
-					paletteCircle.removeEventListener("mousemove",setTriangle);
+					paletteCircle.removeEventListener(moveEvent,setTriangle);
 				}
 				
 			}
-			paletteCircle.addEventListener("mousedown",function(e){
+			paletteCircle.addEventListener(downEvent,function(e){
 				setTriangle(e);
-				paletteCircle.addEventListener("mousemove",setTriangle);
+				paletteCircle.addEventListener(moveEvent,setTriangle);
 			});
-			paletteCircle.addEventListener("mouseup",function(e){
-				paletteCircle.removeEventListener("mousemove",setTriangle);
+			paletteCircle.addEventListener(upEvent,function(e){
+				paletteCircle.removeEventListener(moveEvent,setTriangle);
 			});
-			paletteCircle.addEventListener("mouseleave",function(e){
-				paletteCircle.removeEventListener("mousemove",setTriangle);
+			paletteCircle.addEventListener(leaveEvent,function(e){
+				paletteCircle.removeEventListener(moveEvent,setTriangle);
 			});
-			paletteCircle.addEventListener("mousedown",function(e){
+			paletteCircle.addEventListener(downEvent,function(e){
 				getColor(e);
-				paletteCircle.addEventListener("mousemove",getColor);
+				paletteCircle.addEventListener(moveEvent,getColor);
 			});
-			paletteCircle.addEventListener("mouseup",function(e){
-				paletteCircle.removeEventListener("mousemove",getColor);
+			paletteCircle.addEventListener(upEvent,function(e){
+				paletteCircle.removeEventListener(moveEvent,getColor);
 			});
-			paletteCircle.addEventListener("mouseleave",function(e){
-				paletteCircle.removeEventListener("mousemove",getColor);
+			paletteCircle.addEventListener(leaveEvent,function(e){
+				paletteCircle.removeEventListener(moveEvent,getColor);
 			});
 			function getColor(e){
 				let x = event.offsetX;
@@ -438,7 +442,7 @@ Palette=function(){
 					let pixel = ptx.getImageData(x, y, 1, 1);
 					let data = pixel.data;
 					if(!(data[0]===255&&data[1]===255&&data[2]===255)&&e.isTrusted===true){  //反正你也不会到这里找纯白吧
-						paletteCircleContainer.rgb={R:data[0],G:data[1],B:data[2]};
+						paletteCircleContainer_rgb={R:data[0],G:data[1],B:data[2]};
 						pen.rgb={R:data[0],G:data[1],B:data[2]};
 						 colorPosition.x=x;
 						 colorPosition.y=y;	
@@ -449,11 +453,11 @@ Palette=function(){
 						ctx.stroke();
 					}
 					else{
-						paletteCircle.removeEventListener("mousemove",getColor);
+						paletteCircle.removeEventListener(moveEvent,getColor);
 					}
 				}
 				else{
-					paletteCircle.removeEventListener("mousemove",getColor);
+					paletteCircle.removeEventListener(moveEvent,getColor);
 				}
 			}		
 			paletteCircleContainer.style.position="relative";
@@ -524,7 +528,7 @@ Palette=function(){
 					}
 				}
 			}
-			paletteBlock.onpointerdown=function(e){ 
+			paletteBlock[onDown]=function(e){ 
 				let colorRange=blockW/column;
 				selected.style.gridColumn=Math.ceil(e.offsetX/colorRange);
 				selected.style.gridRow=Math.ceil(e.offsetY/colorRange);
@@ -544,6 +548,7 @@ Palette=function(){
 		
 		
 		let selectedColors=document.createElement("div");
+		let selectedColors_leftSelected;
 		(function(){
 			selectedColors.style.position="absolute";
 			selectedColors.style.right=0;
@@ -564,14 +569,14 @@ Palette=function(){
 				
 				selectedColors.appendChild(colorBlock.cloneNode(true));
 			}
-			selectedColors.leftSelected=selectedColors.firstElementChild;
-			selectedColors.leftSelected.style.boxShadow="inset 0 0 0 0.15em black";
-			selectedColors.onpointerdown=function(e){
+			selectedColors_leftSelected=selectedColors.firstElementChild;
+			selectedColors_leftSelected.style.boxShadow="inset 0 0 0 0.15em black";
+			selectedColors[onDown]=function(e){
 				let block=e.target;
 				if(e.button===0&&block.tagName==="BUTTON"){
-					selectedColors.leftSelected.style.boxShadow="";
-					selectedColors.leftSelected=block;
-					selectedColors.leftSelected.style.boxShadow="inset 0 0 0 0.15em black";
+					selectedColors_leftSelected.style.boxShadow="";
+					selectedColors_leftSelected=block;
+					selectedColors_leftSelected.style.boxShadow="inset 0 0 0 0.15em black";
 				 	let[r,g,b]=block.style.backgroundColor.slice(4,-1).split(",").map(x=>Number(x));
 					if(e.isTrusted===true){
 						pen.rgb={R:r,G:g,B:b}
@@ -581,6 +586,7 @@ Palette=function(){
 		})();
 				
 		let thicknesses=document.createElement("div");
+		let thicknesses_selected;
 		(function(){
 			let thinknessAmount=20;
 			let thinkest=20;
@@ -610,10 +616,10 @@ Palette=function(){
 				}
 				let thisThickCanvas=thickCanvas.cloneNode(true);
 				thisThickCanvas.dataNum=i*2;
-				thisThickCanvas.onpointerdown=function(e){
+				thisThickCanvas[onDown]=function(e){
 					pen.lineAddShadowWidth=this.dataNum;
-					thicknesses.selected.style.boxShadow="";
-					thicknesses.selected=this;
+					thicknesses_selected.style.boxShadow="";
+					thicknesses_selected=this;
 					this.style.boxShadow="inset 0 0 0 0.15em red";
 				}
 				let ctx=thisThickCanvas.getContext('2d');
@@ -623,8 +629,8 @@ Palette=function(){
 				ctx.fill();
 				thicknesses.appendChild(thisThickCanvas);
 			}		
-			thicknesses.selected=thicknesses.childNodes[thinknessAmount-3];
-			thicknesses.selected.style.boxShadow="inset 0 0 0 0.15em red";
+			thicknesses_selected=thicknesses.childNodes[thinknessAmount-3];
+			thicknesses_selected.style.boxShadow="inset 0 0 0 0.15em red";
 		})();
     
 		
@@ -658,6 +664,7 @@ Palette=function(){
 		})();
 		
 		let blurs=document.createElement("div");
+		let blurs_selected;
 		(function(){
 			let blurAmount=4;
 			const SCROLLW=17;
@@ -688,17 +695,17 @@ Palette=function(){
 				ctx.fill();
 				let blurProportion=(blurAmount-1-i)/(blurAmount-1)*0.9;
 				blur.dataNum=blurProportion;
-				blur.onpointerdown=function(e){
+				blur[onDown]=function(e){
 					pen.blurProportion=this.dataNum;
-					blurs.selected.style.boxShadow="";
-					blurs.selected=this;
+					blurs_selected.style.boxShadow="";
+					blurs_selected=this;
 					this.style.boxShadow="inset 0 0 0 0.15em red";
 				}
 				blurs.appendChild(blur);
 		
 			}
-				blurs.selected=blurs.lastElementChild;
-				blurs.selected.style.boxShadow="inset 0 0 0 0.15em red";
+				blurs_selected=blurs.lastElementChild;
+				blurs_selected.style.boxShadow="inset 0 0 0 0.15em red";
 		})();
 		
 		let alpha=document.createElement("div");
@@ -730,15 +737,15 @@ Palette=function(){
 				alphaDot.style.top=e.offsetY-ALPHACIRCLE;
 				alphaDot.style.left=e.offsetX-ALPHACIRCLE;
 			}
-			alphaBar.onpointerdown=function(e){
+			alphaBar[onDown]=function(e){
 				getAlpha(e);
-				alphaBar.onpointermove=getAlpha;			
+				alphaBar[onMove]=getAlpha;			
 			}
 			alpha.onpointerleave=function(e){
-				alphaBar.onpointermove="";
+				alphaBar[onMove]="";
 			}
-			alpha.onpointerup=function(e){
-				alphaBar.onpointermove="";
+			alpha[onUp]=function(e){
+				alphaBar[onMove]="";
 			}
 		})();		
 		let palette=document.createElement("div");

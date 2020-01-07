@@ -1,4 +1,9 @@
 function flash(name){
+	const [downEvent,upEvent,moveEvent,leaveEvent,onDown,onUp,onMove,onLeave]=
+	window.onpointerdown===undefined?
+	["mousedown","mouseup","mousemove","mouseleave","onmousedown","onmouseup","onmousemove","onmouseleave"]:
+	["pointerdown","pointerup","pointermove","pointerleave","onpointerdown","onpointerup","onpointermove","onpointerleave"];
+
 	const PING_INTERVAL=38000;
 	const PING_TIMEOUT=15000;
 //	const WS_PORT="8081";
@@ -112,9 +117,9 @@ function flash(name){
 		
 		
 		function endPaint(event){
-			realboard.onpointermove=null;
-			realboard.onpointerup=null;
-			realboard.onpointerleave=null;
+			realboard[onMove]=null;
+			realboard[onUp]=null;
+			realboard[onLeave]=null;
 			
 			if(canvasPointer<maxLength){
 				canvasPointer=canvasPointer+1;
@@ -130,11 +135,11 @@ function flash(name){
 			lineSteps=[];
 			downUpLineNum++;
 		}
-		realboard.onpointerup=endPaint;
-		realboard.onpointerleave=endPaint;
+		realboard[onUp]=endPaint;
+		realboard[onLeave]=endPaint;
 
 
-		realboard.onpointermove=function(event){
+		realboard[onMove]=function(event){
 			//event.preventDefault();
 			ctx.beginPath();
 				if(aLineArray.length>DRAW_PILES){
@@ -295,14 +300,14 @@ function flash(name){
 				tipsDiv.innerText=nazo.tips;
 				drawingNameDiv.innerText=content.drawname;
 				if(gameState==="draw"){
-					realboard.onpointerdown=drawListener;
+					realboard[onDown]=drawListener;
 					nazoDiv.innerHTML="谜底: &ensp; "+"<span>"+nazo.nazo+"</span>";
 					document.getElementById("draw-tool").style.display="block";
 					document.getElementById("clock").style.display="none";
 					document.getElementById("drawTimeLimit").style.display="block";
 				}
 				else if(gameState==="guess"){
-					realboard.onpointerdown=null;
+					realboard[onDown]=null;
 					nazoDiv.innerHTML="绘画者: &ensp;&ensp; "+"<span>"+content.drawname+"</span>"+" &ensp;さん";
 					document.getElementById("draw-tool").style.display="none";
 					document.getElementById("drawTimeLimit").style.display="none";
@@ -508,7 +513,7 @@ function flash(name){
 				},DRAW_PILES);
 			}
 			initTurn();
-			realboard.onpointerdown=drawListener;
+			realboard[onDown]=drawListener;
 			document.getElementById("drawTimeLimit").style.display="none";				
 			document.getElementById("draw-tool").style.display="block";				
 			//pen.setCtxPressure(ctx,{});
