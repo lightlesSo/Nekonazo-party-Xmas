@@ -9,7 +9,8 @@
          "game-proc.rkt"
          "login.rkt"
          (only-in "account-proc.rkt" account-proc)
-         "room-proc.rkt")
+         "room-proc.rkt"
+         "obs.rkt")
 
 (require web-server/dispatchers/dispatch-files
          web-server/dispatchers/filesystem-map
@@ -22,23 +23,7 @@
                                                              ((string-suffix? (path->string path) ".css") (string->bytes/utf-8 "text/css"))
                                                              (#t #f)))) 
          #:port static-port))
-(define (broadcast-if-room-status-modify fun)
-  (define (broadcast)
-    (define rooms-namelist 
-      (filter string?
-              (hash-map name-status 
-                        (lambda (key value) 
-                          (if (equal? "rooms" (hash-ref value 'state '()))
-                              key
-                              '())))))
-    (define (oneroomstatus key value)
-      (make-hash (list (cons 'room key) 
-                       (cons 'peoplenum (length (hash-ref value 'names)))	  
-                       (cons 'roomstatus (hash-ref value 'gamestate)))))
-    (define roomsstatus (hash-map  room-status oneroomstatus))
-    ;(display rooms-namelist)
-    (broadcast-json rooms-namelist "room" "currentrooms" `#hasheq((roomlist . ,roomsstatus)) ))
-  (obs-hash room-status fun broadcast))
+
 (define (proc client params)
   (define name (extract-binding/single 'name params))
   (let/cc close
@@ -47,7 +32,7 @@
              (data (with-handlers ((exn:fail? (lambda(e) rec)))                                        
                      (begin (string->jsexpr rec)))) 
      
-             (result (broadcast-if-room-status-modify
+             (result (obs
                       (thunk
                        ;(display rec)
                        (match data  

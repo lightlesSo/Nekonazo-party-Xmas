@@ -97,7 +97,7 @@
 			font-family: sans-serif;
 			font-weight: lighter;
 		}
-		#puzzle-text span{
+		#puzzle-text>span{
 			font-size: 1.2em;/*1.04*/
 			color: #5d2191;
 			font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
@@ -299,12 +299,12 @@
 		}
 		.roomMessageLine{
 		}
-		.roomMessageLine span{
+		.roomMessageLine>span{
 			color: #95155c;
 			font-weight: bold;
 			font-family: Georgia, serif;		
 		}
-		.roomMessageLine .lname{
+		.roomMessageLine>.lname{
 			font-weight: normal;			
 		}
 		#avatar{
@@ -435,7 +435,7 @@
 			top: 16%;
 			color: rgb(47,113,207);
 		}
-		.room div{
+		.room>div{
 			pointer-events:none;
 			background: rgba(0,0,0,0);
 			position: absolute;
@@ -444,7 +444,7 @@
 			height: 52%;
 			width: 22%;
 		}
-		.room div:before{
+		.room>div:before{
 			pointer-events:none;
 			font-family: "Comic Sans MS", cursive, sans-serif;
 			left: 182%;
@@ -455,7 +455,7 @@
 			color: white;
 			transform: rotate(-15deg);
 		}
-		.room div:after{
+		.room>div:after{
 			pointer-events:none;
 			content: attr(data-peoplenum) " / 6";
 			right: -284%;
@@ -465,11 +465,11 @@
 			color: rgb(26,141,136);
 			font-family: Impact, Charcoal, sans-serif;
 		}
-		#room-999 div:before{
+		#room-999>div:before{
 			left: -20%;
 			font-size: x-large;
 		}
-		#room-999 div:after{
+		#room-999>div:after{
 			content: "";
 			height: 72%;
 			right: -240%;
@@ -504,7 +504,7 @@
 			width: 25.5vh;
 			border-radius: 0.5em;
 		}
-		#rooms-r img{
+		#rooms-r>img{
 			
 		}
 		
@@ -518,7 +518,7 @@
 			left: 97.7vh;
 			border-radius: 1em 0em 1em 1em;
 		}
-		#rooms-rb div{
+		#rooms-rb>div{
 			margin: 3vh 1vh 2vh 2vh;
 			color: rgb(0,0,23);
 			text-shadow: white 1px 1px 0em, white -1px -1px 0em;
@@ -670,7 +670,7 @@
 			animation:nalpha 0.5s 1.4s 1 forwards;
 			animation-timing-function:ease-in;
 		}
-		#N div{
+		#N>div{
 			background:url("images/N.png") no-repeat;
 			background-position:center;
 			height:100%;

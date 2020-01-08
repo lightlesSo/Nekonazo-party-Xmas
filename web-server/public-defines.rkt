@@ -7,22 +7,29 @@
 ;(define ws-pool (make-immutable-hasheq))
 ;(define name-status (make-immutable-hasheq)); (name #hasheq((dsf . df)(.))
 ;(define room-status (make-immutable-hasheq)); (room #hasheq((drawsteps . df)(room . '(name name))(.))
-(define root (make-hasheq (list (cons 'ws-pool (make-immutable-hasheq))
+(define root-box (box (make-immutable-hasheq (list (cons 'ws-pool (make-immutable-hasheq))
                                 ( cons 'name-status (make-immutable-hasheq))
-                                (cons 'room-status (make-immutable-hasheq)))))
+                                (cons 'room-status (make-immutable-hasheq))))))
+(define root
+  (case-lambda (() (unbox root-box ))
+               #;((new-data) (set-box! root-box new-data))));不然provide会多出不能用的功能，或者要新建一个没有更改功能的root
 ;parameter是线程私有的
 (define ws-pool 
-	(case-lambda (() (hash-ref root 'ws-pool))
-				((new-data) (hash-set! root 'ws-pool new-data)))
-				#;((k v ) (ws-pool (hash-set (ws-pool) k v)))
-				#;((k v fail) (ws-pool (hash-set (ws-pool) k v fail)));有用吗，对于更深层嵌套也没用 update也没有 就算有update 可以#: 深层也没法处理 还有remove 别了，反而会混乱，虽说能少些几个字
-				)
+  (case-lambda (() (hash-ref (root) 'ws-pool))
+               ((new-data) (set-box! root-box (hash-set (root) 'ws-pool new-data)))
+               ((k v ) (ws-pool (hash-set (ws-pool) k v)))
+               ((k v fail) (ws-pool (hash-set (ws-pool) k v fail)));有用吗，对于更深层嵌套也没用 update也没有 就算有update 可以#: 深层也没法处理 还有remove 别了，反而会混乱，虽说能少些几个字
+               ));有意义的，能覆盖大部分地区，update只是能方便取得要改的value
 (define room-status 
-	(case-lambda (() (hash-ref root 'room-status ))
-				((new-data) (hash-set! root 'room-status  new-data))))
+  (case-lambda (() (hash-ref (root) 'room-status ))
+               ((new-data) (set-box! root-box (hash-set (root) 'room-status  new-data)))
+               ((k v ) (room-status (hash-set (room-status) k v)))
+               ((k v fail) (room-status (hash-set (room-status) k v fail)))))
 (define name-status 
-	(case-lambda (() (hash-ref root 'name-status))
-				((new-data) (hash-set! root 'name-status new-data))))
+  (case-lambda (() (hash-ref (root) 'name-status))
+               ((new-data) (set-box! root-box (hash-set (root) 'name-status new-data)))
+               ((k v ) (name-status (hash-set (name-status) k v)))
+               ((k v fail) (name-status (hash-set (name-status) k v fail)))))
 (room-status (hash-set (room-status) "1" (make-hash '((names . ())(drawsteps . ())(gamestate . "ready"))))) ;;测试用
 (room-status (hash-set (room-status) "2" (make-hash '((names . ())(drawsteps . ())(gamestate . "ready")))))
 #;(define (name->client name (fail "meiyou"))
@@ -52,9 +59,23 @@
       ;(hash-update! name-status name (lambda (x)(hash-set x key value)) fail)))
       (hash-set! (hash-ref name-status name) key value)
       (hash-set! (hash-ref name-status name fail) key value )));这行没用
-(define update-status!
-  (case-lambda ((name key value)(name-status (hash-update (name-status) key (lambda (v) value) value)))
+#;(define update-status!
+  (case-lambda ((name key value)
+                (name-status
+                 (hash-update (name-status) name
+                              (lambda (status)
+                                (with-handlers ((exn:fail? (lambda(e)(hasheq)))) ;读取的不是hash会报错，这样只是隐藏了错误。。不应该这样，正常程序不会有非hash值
+                                  (hash-set status key value )))
+                              #;`#hasheq((,key . ,value这里被前面with-handlers覆盖了)))))
                #;((name key value fail)(hash-set! (hash-ref name-status name fail) key value ))))
+(define update-status!
+  (case-lambda ((name key value)
+                (name-status
+                 (hash-update (name-status)
+                              name
+                              (lambda (status)                             
+                                  (hash-set status key value ))
+                              (hasheq))))))
 #;(define (room->roomstatus room (fail "meiyou"))
   "似乎根本没用上"
   (if (equal? fail "meiyou")
@@ -86,25 +107,23 @@
   (begin (if (hash-has-key? this-room-status 'gametimer)
              (cancel-timer!  (hash-ref this-room-status 'gametimer))
              '())
-         (hash-remove! this-room-status 'gametimer)   ;;;从这里开始     and  (lock 资源1 #f (thunk  (lock 资源2 (失败不等待,直接跳到最外层请求资源1那时)
+       #|  (hash-remove! this-room-status 'gametimer)   ;;;从这里开始     and  (lock 资源1 #f (thunk  (lock 资源2 (失败不等待,直接跳到最外层请求资源1那时)
          (hash-remove! this-room-status 'nazo)
          (hash-remove! this-room-status 'drawname)
          (hash-set! this-room-status 'gamestate "ready")
-         (hash-set! this-room-status 'drawsteps '())))
+         (hash-set! this-room-status 'drawsteps '())|#
+         (define new-room-status
+           (hash-set
+            (hash-remove* this-room-status 'gametimer 'nazo 'drawname)
+            'gamestate "ready" 'drawsteps '()))
+         (room-status room new-room-status)))
 (define (send-current-rooms name)
   (define (oneroomstatus key value)
     (make-hash (list (cons 'room key) 
                      (cons 'peoplenum (length (hash-ref value 'names)))	  
                      (cons 'roomstatus (hash-ref value 'gamestate)))))
-  (define roomsstatus (hash-map  room-status oneroomstatus))
+  (define roomsstatus (hash-map  (room-status) oneroomstatus))
   ;racket 在key为数字时 jsexpr->string会失效
   (send-json name "room" "currentrooms" `#hasheq((roomlist . ,roomsstatus))))
-(define (obs-hash hashtable fun proc)
-  "hashtable在fun执行后如果变化，就执行proc"
-  (define old-hash-code (equal-hash-code hashtable))
-  (begin0 (fun)
-         ; (display old-hash-code)
-          (if (equal? old-hash-code (equal-hash-code hashtable))
-              (void)
-              (proc))))
-(provide (all-defined-out))
+
+(provide (except-out (all-defined-out) root-box))
