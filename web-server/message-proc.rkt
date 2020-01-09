@@ -7,14 +7,14 @@
 (define (message-proc name data)  
   (match data
     ((hash-table  ('type2 "guess") ('content content-json))
-     #:when(and (equal? (hash-ref (hash-ref name-status name) 'state) "room") (equal? (hash-ref (hash-ref name-status name) 'gamestate) "guess"))
+     #:when(and (equal? (hash-ref (hash-ref (name-status) name) 'state) "room") (equal? (hash-ref (hash-ref (name-status) name) 'gamestate) "guess"))
      (define guess-message (hash-ref content-json 'message))
      (begin (room-broadcast name "message" "guess" (hash-set content-json 'name name))
        (guess-proc name guess-message)))
     ((hash-table  ('type2 "room") ('content content-json))
-     #:when(and (equal? (hash-ref (hash-ref name-status name) 'state) "room"))
+     #:when(and (equal? (hash-ref (hash-ref (name-status) name) 'state) "room"))
      (define message (hash-ref content-json 'message))
-     (define game-state (hash-ref (hash-ref name-status name) 'gamestate))
+     (define game-state (hash-ref (hash-ref (name-status) name) 'gamestate))
      (begin (room-broadcast name "message" "room" (hash-set content-json 'name name))
             (match game-state
               ("guess" (guess-proc name message))

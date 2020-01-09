@@ -6,27 +6,27 @@
 	"没用"
   (define rooms-namelist 
 	(filter string?
-		(hash-map name-status 
+		(hash-map (name-status) 
 		  (lambda (key value) 
 			(if (equal? "rooms" (hash-ref value 'state '()))
 				key
 				'())))))
   (begin 
     (broadcast-json rooms-namelist "room" "removeroom" `#hasheq((room . ,room)))
-	(hash-remove! room-status room)))
+	(room-status (hash-remove (room-status) room))))
 (define (newroom room)
-  (if (hash-has-key? room-status room)
+  (if (hash-has-key? (room-status) room)
 	#f
-   (hash-set! room-status room (make-hash '((names . ())(drawsteps . ())(gamestate . "ready"))))))
+   (room-status (hash-set (room-status) room (make-immutable-hash '((names . ())(drawsteps . ())(gamestate . "ready")))))))
 (define (addroom name room)
   (newroom room))
 (define (send-current-rooms name)
 	"没用"
   (define (oneroomstatus key value)
-	  (make-hash (list (cons 'room key) 
+	  (make-immutable-hash (list (cons 'room key) 
 	(cons 'peoplenum (length (hash-ref value 'names)))	  
 	(cons 'roomstatus (hash-ref value 'gamestate)))))
-  (define roomsstatus (hash-map  room-status oneroomstatus))
+  (define roomsstatus (hash-map  (room-status) oneroomstatus))
   ;  racket 在key为数字时 jsexpr->string会失败
   (send-json name "room" "currentrooms" `#hasheq((roomlist . ,roomsstatus))))
 (define (room-proc name data)

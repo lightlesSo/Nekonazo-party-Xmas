@@ -4,12 +4,12 @@
 (require web-server/private/timer)
 (define nazo-words-list (list->vector (string->jsexpr (file->string "asset/words-from-Nekonazo0.json"))))
 (define nazo-words-list-length (vector-length  nazo-words-list))
-;(define ws-pool (make-immutable-hasheq))
-;(define name-status (make-immutable-hasheq)); (name #hasheq((dsf . df)(.))
-;(define room-status (make-immutable-hasheq)); (room #hasheq((drawsteps . df)(room . '(name name))(.))
-(define root-box (box (make-immutable-hasheq (list (cons 'ws-pool (make-immutable-hasheq))
-                                ( cons 'name-status (make-immutable-hasheq))
-                                (cons 'room-status (make-immutable-hasheq))))))
+;(define (ws-pool) (make-immutable-hash))
+;(define (name-status) (make-immutable-hash)); (name #hasheq((dsf . df)(.))
+;(define (room-status) (make-immutable-hash)); (room #hasheq((drawsteps . df)(room . '(name name))(.))
+(define root-box (box (make-immutable-hash (list (cons 'ws-pool (make-immutable-hash))
+                                ( cons 'name-status (make-immutable-hash))
+                                (cons 'room-status (make-immutable-hash))))))
 (define root
   (case-lambda (() (unbox root-box ))
                #;((new-data) (set-box! root-box new-data))));不然provide会多出不能用的功能，或者要新建一个没有更改功能的root
@@ -25,49 +25,49 @@
                ((new-data) (set-box! root-box (hash-set (root) 'room-status  new-data)))
                ((k v ) (room-status (hash-set (room-status) k v)))
                ((k v fail) (room-status (hash-set (room-status) k v fail)))))
-(define name-status 
+(define name-status
   (case-lambda (() (hash-ref (root) 'name-status))
                ((new-data) (set-box! root-box (hash-set (root) 'name-status new-data)))
                ((k v ) (name-status (hash-set (name-status) k v)))
                ((k v fail) (name-status (hash-set (name-status) k v fail)))))
-(room-status (hash-set (room-status) "1" (make-hash '((names . ())(drawsteps . ())(gamestate . "ready"))))) ;;测试用
-(room-status (hash-set (room-status) "2" (make-hash '((names . ())(drawsteps . ())(gamestate . "ready")))))
+(room-status (hash-set (room-status) "1" (make-immutable-hash '((names . ())(drawsteps . ())(gamestate . "ready"))))) ;;测试用
+(room-status (hash-set (room-status) "2" (make-immutable-hash '((names . ())(drawsteps . ())(gamestate . "ready")))))
 #;(define (name->client name (fail "meiyou"))
-  (if (equal? fail "meiyou")
-      (hash-ref ws-pool name)
-      (hash-ref ws-pool name fail)))
+  (if (equal? fail "meiyou") ;):) :( *_* *D  '_' "_" "_' ;_; ~_~!!)
+      (hash-ref (ws-pool) name) ;):) :( `_` ^_- XD  '_' "_" "_' ;_; ~_~!!)
+      (hash-ref (ws-pool) name fail)))
 (define name->client 
 	(case-lambda ((name)(hash-ref (ws-pool) name))
 		((name fail)(hash-ref (ws-pool) name fail))));这些都应该不要，但是这个可以作为一个例外 只是为了找到唯一对应关系
 #;(define (room->namelist room (fail "meiyou"))
   (if (equal? fail "meiyou")
-      (hash-ref (hash-ref room-status room ) 'names )
-      (hash-ref (hash-ref room-status room (make-hash)) 'names fail)))
+      (hash-ref (hash-ref (room-status) room ) 'names )
+      (hash-ref (hash-ref (room-status) room (make-hash)) 'names fail)))
 (define room->namelist
   (case-lambda ((room)(hash-ref (hash-ref (room-status) room ) 'names ))
-               ((room fail) (hash-ref (hash-ref (room-status) room (make-hash)) 'names fail))))
+               ((room fail) (hash-ref (hash-ref (room-status) room (hash)) 'names fail))))
 #;(define (name->status name (fail "meiyou"))
   (if (equal? fail "meiyou")
-      (hash-ref name-status name)
-      (hash-ref name-status name fail)))
+      (hash-ref (name-status) name)
+      (hash-ref (name-status) name fail)))
 (define name->status
   (case-lambda ((name) (hash-ref (name-status) name))
                ((name fail) (hash-ref (name-status) name fail))))
 #;(define (update-status! name key value (fail "meiyou"))
   (if (equal? fail "meiyou")
-      ;(hash-update! name-status name (lambda (x)(hash-set x key value)))
-      ;(hash-update! name-status name (lambda (x)(hash-set x key value)) fail)))
-      (hash-set! (hash-ref name-status name) key value)
-      (hash-set! (hash-ref name-status name fail) key value )));这行没用
+      ;(hash-update! (name-status) name (lambda (x)(hash-set x key value)))
+      ;(hash-update! (name-status) name (lambda (x)(hash-set x key value)) fail)))
+      (hash-set! (hash-ref (name-status) name) key value)
+      (hash-set! (hash-ref (name-status) name fail) key value )));这行没用
 #;(define update-status!
   (case-lambda ((name key value)
                 (name-status
                  (hash-update (name-status) name
                               (lambda (status)
-                                (with-handlers ((exn:fail? (lambda(e)(hasheq)))) ;读取的不是hash会报错，这样只是隐藏了错误。。不应该这样，正常程序不会有非hash值
+                                (with-handlers ((exn:fail? (lambda(e)(hash)))) ;读取的不是hash会报错，这样只是隐藏了错误。。不应该这样，正常程序不会有非hash值
                                   (hash-set status key value )))
                               #;`#hasheq((,key . ,value这里被前面with-handlers覆盖了)))))
-               #;((name key value fail)(hash-set! (hash-ref name-status name fail) key value ))))
+               #;((name key value fail)(hash-set! (hash-ref (name-status) name fail) key value ))))
 (define update-status!
   (case-lambda ((name key value)
                 (name-status
@@ -75,21 +75,32 @@
                               name
                               (lambda (status)                             
                                   (hash-set status key value ))
-                              (hasheq))))))
+                              (hash))))))
+(define update-room-status!
+  (case-lambda ((room key value)
+                (room-status
+                 (hash-update (room-status)
+                              room
+                              (lambda (status)                             
+                                  (hash-set status key value ))
+                              (hash))))))
 #;(define (room->roomstatus room (fail "meiyou"))
   "似乎根本没用上"
   (if (equal? fail "meiyou")
-      (hash-ref room-status room)
-      (hash-ref room-status room fail)))
+      (hash-ref (room-status) room)
+      (hash-ref (room-status) room fail)))
 (define room->status
   (case-lambda ((room) (hash-ref (room-status) room))
                ((room fail) (hash-ref (room-status) room fail))))
-(define (hash-remove* hash . keys)
-  (define (proc hash keys)
+
+  (define (hash-remove*-proc hash keys)
     (if (null? keys)
         hash
-        (proc (hash-remove hash (car keys)) (cdr keys))))
-  (proc hash keys))
+        (hash-remove*-proc (hash-remove hash (car keys)) (cdr keys))))
+(define (hash-remove-list hash list)
+	(hash-remove*-proc hash list))
+(define (hash-remove* hash . keys)
+  (hash-remove*-proc hash keys))
   
 (define (send-json to-name type type2 whole-json)
   (ws-send! (name->client to-name)
@@ -113,13 +124,13 @@
          (hash-set! this-room-status 'gamestate "ready")
          (hash-set! this-room-status 'drawsteps '())|#
          (define new-room-status
-           (hash-set
+           (hash-set*
             (hash-remove* this-room-status 'gametimer 'nazo 'drawname)
             'gamestate "ready" 'drawsteps '()))
          (room-status room new-room-status)))
 (define (send-current-rooms name)
   (define (oneroomstatus key value)
-    (make-hash (list (cons 'room key) 
+    (make-immutable-hash (list (cons 'room key) 
                      (cons 'peoplenum (length (hash-ref value 'names)))	  
                      (cons 'roomstatus (hash-ref value 'gamestate)))))
   (define roomsstatus (hash-map  (room-status) oneroomstatus))

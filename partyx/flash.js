@@ -579,9 +579,10 @@ function flash(name){
 				}
 				else{
 					messageBoxDisplayLine("Neko:&ensp;<span>"+content.name+"</span>离开了");
-					document.getElementById(nameToId(content.name)).id="";
+					
 					document.getElementById(nameToId(content.name)).dataset.name="";
 					document.getElementById(nameToId(content.name)).className="character";
+					document.getElementById(nameToId(content.name)).id="";
 				}
 			}
 		}

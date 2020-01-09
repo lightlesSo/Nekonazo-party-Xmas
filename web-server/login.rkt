@@ -6,7 +6,7 @@
 (define (get-anonymous-name)
   (define (proc n)
     (let ((name (string-append "anonymous" (~a n))))
-      (if (hash-has-key? ws-pool name)
+      (if (hash-has-key? (ws-pool) name)
           (proc (+ n 1))
           name)))
   (proc 1))
@@ -17,7 +17,7 @@
 				(get-anonymous-name)
 				(hash-ref content 'name))))
             
-          (if (or (hash-has-key? ws-pool name) (equal? name "") (not (string? name)))
+          (if (or (hash-has-key? (ws-pool) name) (equal? name "") (not (string? name)))
               (begin(if(or (equal? name "") (not (string? name)))
                        (ws-send! client (jsexpr->string
                                          `#hasheq((type . "account")
@@ -31,8 +31,8 @@
                                                                      (status . "duplicate")))))))
                     (ws-close! client)
                    )
-              (begin (hash-set! ws-pool name client)
-                     (hash-set! name-status name (make-hash '((state . "rooms"))))
+              (begin (ws-pool (hash-set (ws-pool) name client))
+                     (name-status name (make-immutable-hash '((state . "rooms"))))
                    (ws-send! client (jsexpr->string
                                      `#hasheq((type . "account")
                                               (type2 . "login")

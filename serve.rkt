@@ -55,7 +55,7 @@
        ((room-status) (displayln room-status))
        ((ws-pool) (displayln ws-pool)))
      (repl (read)))
-	; (debug-repl)
+	; (debug-repl):) :( X D '_' "_" "_' ;_; ~_~!!)
   ; (repl (read)) ;or
    "test-mode"
    ))

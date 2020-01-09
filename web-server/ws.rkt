@@ -55,12 +55,12 @@
   (if (not (equal? origin host))       
                
       (begin (ws-send! client (jsexpr->string
-                               `#hasheq((type . "account")
+                               `#hasheqeq((type . "account")
                                         (type2 . "login")
-                                        (content . #hasheq((name . "origin-problem")
+                                        (content . #hasheqeq((name . "origin-problem")
                                                            (status . "not-same-origin"))))))
              (ws-close! client ))
-      (let ((name (login client `#hasheq((name . ,username)))))
+      (let ((name (login client `#hasheqeq((name . ,username)))))
         (if (void? name)
             '()
             (proc client (list (cons 'name name)))))))
