@@ -8,6 +8,9 @@
           (if (equal? old-hash-code (equal-hash-code hashtable))
               (void)
               (proc))))
+(define (dif-hash old-hash new-hash)
+  (define (proc old new ret)
+    (if
 (define (obs-hash get-hash fun proc)  
   " (get-hash) 因为是不可变 需要一个取得的方法
 hashtable在满足条件后执行后如果变化，就执行(proc old new)"
@@ -40,3 +43,4 @@ hashtable在满足条件后执行后如果变化，就执行(proc old new)"
 (define (obs fun)
   (obs-hash root fun obs-proc))
 (provide obs)
+;draw 特殊 处理，不是用来同步u的只是暂存下 偶尔给新来的人 所以法式自动转 层数不深 直接比较问题不大 不hao性能 equal 应该改为 eq 没问题把 为了这个大表

@@ -21,7 +21,7 @@
   (case type2
     (("lineTo") (if (and (equal? (hash-ref (hash-ref name-status name) 'state) "room") (equal? (hash-ref (hash-ref name-status name) 'gamestate) "draw"))
                   (begin
-                    (hash-update! (hash-ref room-status (hash-ref (hash-ref name-status name) 'room) (make-hash)) 'drawsteps (lambda (x) (append x (car content-json) )) )
+                    (hash-update! (hash-ref room-status (hash-ref (hash-ref name-status name) 'room) (make-hash)) 'drawsteps (lambda (x) (append  (reverse (car content-json)) x )) );步骤是reverse保存单独
                     (broadcast-lineTo name content-json) )
                   '())))
   )
