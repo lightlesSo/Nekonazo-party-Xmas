@@ -31,8 +31,8 @@
                                                                      (status . "duplicate")))))))
                     (ws-close! client)
                    )
-              (begin (ws-pool (hash-set (ws-pool) name client))
-                     (name-status name (make-immutable-hash '((state . "rooms"))))
+              (begin (lock-ws-pool (thunk (ws-pool (hash-set (ws-pool) name client))))
+                     (lock-name-status (thunk (name-status name (hash 'state  "rooms" 'sema (make-semaphore 1)))))
                    (ws-send! client (jsexpr->string
                                      `#hasheq((type . "account")
                                               (type2 . "login")

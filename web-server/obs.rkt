@@ -10,7 +10,7 @@
               (proc))))
 (define (eq-hash-code-equal? hash1 hash2)
   (equal? (eq-hash-code hash1) (eq-hash-code hash2)))
-(define not-obs-keys (list 'drawsteps))
+(define not-obs-keys (list 'drawsteps 'sema))
 (define (dif-hash old-hash new-hash)
   (define (dif old new)
     (define (dif-proc sub-old sub-new keys)
@@ -64,7 +64,7 @@ hashtable在满足条件后执行后如果变化，就执行(proc old new diflis
     ;(display rooms-namelist)
     (broadcast-json rooms-namelist "room" "currentrooms" `#hasheq((roomlist . ,roomsstatus)) ))
   (obs-hash (room-status) fun broadcast))
-(define (broadcast )
+(define (broadcast-room-status )
     (define rooms-namelist 
       (filter string?
               (hash-map (name-status) 
@@ -82,6 +82,6 @@ hashtable在满足条件后执行后如果变化，就执行(proc old new diflis
 (define (obs fun)
   (define (obs-proc old-hash new-hash dif-list)
     (displayln dif-list)
-    (broadcast))
+    (broadcast-room-status))
   (obs-hash root fun obs-proc))
 (provide obs)

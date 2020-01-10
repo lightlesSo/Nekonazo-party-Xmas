@@ -30,8 +30,39 @@
                ((new-data) (set-box! root-box (hash-set (root) 'name-status new-data)))
                ((k v ) (name-status (hash-set (name-status) k v)))
                ((k v fail) (name-status (hash-set (name-status) k v fail)))))
-(room-status (hash-set (room-status) "1" (make-immutable-hash '((names . ())(drawsteps . ())(gamestate . "ready"))))) ;;测试用
-(room-status (hash-set (room-status) "2" (make-immutable-hash '((names . ())(drawsteps . ())(gamestate . "ready")))))
+(room-status (hash-set (room-status) "1" (hash 'sema (make-semaphore 1) 'names  '() 'drawsteps  '() 'gamestate "ready"))) ;;测试用
+(room-status (hash-set (room-status) "2" (hash 'sema (make-semaphore 1) 'names  '() 'drawsteps  '() 'gamestate "ready")))
+(define ws-pool-sema (make-semaphore 1) )
+(define name-status-sema (make-semaphore 1) )
+(define room-status-sema (make-semaphore 1) )
+#;(define (block-sema sema) 
+	(case-lambda (( proc)  (begin (semaphore-wait sema) (proc) 		(semaphore-post sema) ))
+				(( proc fail) (if 	(semaphore-try-wait? sema)
+									(begin (proc) (semaphore-post sema))
+									(fail))) ));fail的过程应该调用call/cc 并且归还信号量
+(define (lock-sema sema)
+	(case-lambda ((proc) (call-with-semaphore sema proc) )
+				((proc fail)  (call-with-semaphore sema proc fail))))
+(define lock-ws-pool (lock-sema ws-pool-sema))
+(define lock-name-status (lock-sema name-status-sema))
+(define lock-room-status (lock-sema room-status-sema))
+;(define room-locks (hash )) ;先新建信号量会有同步问题，建名字，房子时多写点吧 no 写 status里
+;(define name-locks (hash))
+(define (lock-one-room room) 
+"用法 ((lock-one-room "1") (thunk))"
+(lock-sema (hash-ref (hash-ref (room-status) room) 'sema)))
+(define (unlock-one-room room cc proc) 
+"(unlock-one-room room cc (thunk (start room)))"
+(thunk (begin (semaphore-post (hash-ref (hash-ref (room-status) room) 'sema)) (cc (proc)))))
+(define (lock-one-name name)
+(lock-sema (hash-ref (hash-ref (name-status) name) 'sema)))  
+(define (unlock-one-name name cc proc) 
+
+(thunk (begin (semaphore-post (hash-ref (hash-ref (name-status) name) 'sema)) (cc (proc)))))
+(define (name->sema name) 
+(hash-ref (hash-ref (name-status) name) 'sema))
+(define (room->sema room) 
+(hash-ref (hash-ref (room-status) room) 'sema))
 #;(define (name->client name (fail "meiyou"))
   (if (equal? fail "meiyou") ;):) :( *_* *D  '_' "_" "_' ;_; ~_~!!)
       (hash-ref (ws-pool) name) ;):) :( `_` ^_- XD  '_' "_" "_' ;_; ~_~!!)
@@ -114,6 +145,7 @@
         ((equal? accord-type 'room) (broadcast-json (room->namelist accord ) type type2 whole-json))
         (#t (displayln "room-broadcast UNKNOW param"))))
 (define (init-room room)
+((lock-one-room room) (thunk
   (define this-room-status (room->status room ))
   (begin (if (hash-has-key? this-room-status 'gametimer)
              (cancel-timer!  (hash-ref this-room-status 'gametimer))
@@ -127,7 +159,7 @@
            (hash-set*
             (hash-remove* this-room-status 'gametimer 'nazo 'drawname)
             'gamestate "ready" 'drawsteps '()))
-         (room-status room new-room-status)))
+         (room-status room new-room-status))))) ;因为前面用了this-room-status 单独把new-room-status转换成(new-room-status)不行
 (define (send-current-rooms name)
   (define (oneroomstatus key value)
     (make-immutable-hash (list (cons 'room key) 

@@ -2,7 +2,7 @@
 (require net/rfc6455)
 (require json)
 (require "public-defines.rkt")
-(define (remove-room room)
+#;(define (remove-room room)
 	"没用"
   (define rooms-namelist 
 	(filter string?
@@ -15,9 +15,10 @@
     (broadcast-json rooms-namelist "room" "removeroom" `#hasheq((room . ,room)))
 	(room-status (hash-remove (room-status) room))))
 (define (newroom room)
+ (lock-room-status (thunk
   (if (hash-has-key? (room-status) room)
 	#f
-   (room-status (hash-set (room-status) room (make-immutable-hash '((names . ())(drawsteps . ())(gamestate . "ready")))))))
+   (room-status (hash-set (room-status) "2" (hash 'sema (make-semaphore 1) 'names  '() 'drawsteps  '() 'gamestate "ready")))))))
 (define (addroom name room)
   (newroom room))
 (define (send-current-rooms name)

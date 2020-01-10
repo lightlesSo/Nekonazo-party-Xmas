@@ -15,8 +15,8 @@
    
     ;(hash-remove! (ws-pool) name)
     ;(hash-remove! (name-status) name)
-    (ws-pool (hash-remove (ws-pool) name))
-    (name-status (hash-remove (name-status) name))
+    (lock-ws-pool (thunk (ws-pool (hash-remove (ws-pool) name)))) ;上面两个判断的地方没锁 顶多导致快速出进失败，房子名字被消失 问题不大 本来就应该这样
+    (lock-name-status (thunk(name-status (hash-remove (name-status) name))))
     (display (cons "status"(ws-conn-close-status client)))
     (display (cons "reason"(ws-conn-close-reason client)))
   ))

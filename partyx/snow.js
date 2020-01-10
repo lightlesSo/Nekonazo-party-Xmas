@@ -64,12 +64,12 @@ Snow=(function(){ //min maxmul 是倍数，默认的是宽高1px
 		endx=endx/2;
 		let time=Math.random()*(maxTime-minTime)+minTime;
 		element.style.transition="transform "+time+"s";		
-		div.append(element);
+	window.requestAnimationFrame(function(){div.append(element)});
 		setTimeout(function(){
-			element.style.transform=`translate(${endx}px,${endy}px)`;
+			window.requestAnimationFrame(function(){element.style.transform=`translate(${endx}px,${endy}px)`;});
 		},4);
 		setTimeout(function(){
-			element.remove();
+			window.requestAnimationFrame(function(){element.remove();});
 		},time*1000);
 	}
 	let real=function(div,handlers,minMul,maxMul,minTime,maxTime,styles,element,width,height){

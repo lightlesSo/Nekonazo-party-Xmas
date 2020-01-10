@@ -8,11 +8,12 @@
 
 
 (define (after-a-turn room)
-  (define namelist (room->namelist room))
+  
   (begin
     (init-room room)
-    (map (lambda (name) (begin (update-status! name 'gamestate "ready")
-                               ))
+	(define namelist (room->namelist room))
+    (map (lambda (name) ((lock-one-name name)(thunk(begin (update-status! name 'gamestate "ready")
+                               ))))
          namelist)
     (start-game room)
   ))
@@ -38,7 +39,8 @@
          namelist)
     (after-a-turn room)
     ))
-(define (set-gametimer room time-limit)  
+(define (set-gametimer room time-limit) 
+((lock-one-room room) (thunk 
   (define game-timer (start-timer
                  (start-timer-manager)
                  time-limit
@@ -46,12 +48,13 @@
                    (timeup-proc room)
                    )))
   #;(hash-set! (hash-ref (room-status) room) 'gametimer game-timer )
-  (room-status (hash-update (room-status) room (lambda (status) (hash-set status 'gametimer game-timer)))))
+  (room-status (hash-update (room-status) room (lambda (status) (hash-set status 'gametimer game-timer)))))))
 (define (send-ready name send-to)
   (define content `#hasheq((name . ,name)(gamestate . ,(hash-ref (name->status name) 'gamestate "unknown"))))
   (ws-send! (name->client send-to) (jsexpr->string `#hasheq((type . "game")(type2 . "getReady")(content . ,content)))))
 
 (define (start-game room )
+(let/cc cc ((lock-one-room room) (thunk
   (define namelist (room->namelist room ))
   (if (or (findf (lambda(name)  (equal? (hash-ref (hash-ref (name-status) name) 'gamestate) "notready"))
              namelist)
@@ -86,21 +89,21 @@
                                                  'nazo nazo
                                                  'drawname drawname
                                                  'drawnlist new-drawn-list))))
-               (update-status! drawname 'gamestate "draw")
+               ((lock-one-name drawname) (thunk(update-status! drawname 'gamestate "draw")) (unlock-one-room room cc (thunk(start-game room))))
                (ws-send! (name->client drawname)
                          (jsexpr->string `#hasheq((type . "game")
                                                   (type2 . "gameStart")
                                                   (content . ,drawcontent))))
                
                (map (lambda(guessname)
-                      (begin(update-status! guessname 'gamestate "guess")
+                      (begin ((lock-one-name guessname) (thunk(update-status! guessname 'gamestate "guess")) (unlock-one-room room cc (thunk(start-game room))))
                             (ws-send! (name->client guessname)
                                       (jsexpr->string `#hasheq((type . "game")
                                                                (type2 . "gameStart")
                                                                (content . ,guesscontent))))
                             ))
                     guessnames)
-               (set-gametimer room time-limit)))))
+               (set-gametimer room time-limit))))))))
 (define (game-proc name data)
   (match data
     ((hash-table  ('type2 "getReady") ('content content-json))
@@ -110,7 +113,7 @@
     ((hash-table ('type2 "setReady") ('content content-json))
      #:when(equal? (hash-ref (hash-ref (name-status) name) 'state) "room")
      (begin (define namelist (room->namelist (hash-ref (hash-ref (name-status) name) 'room)))
-            (update-status! name 'gamestate (hash-ref content-json 'gamestate))
+           ((lock-one-name name)( thunk(update-status! name 'gamestate (hash-ref content-json 'gamestate)))) ;这用枷锁吗，只有自己能改，而且同时只有一个登录
             (map (lambda(x)(send-ready name x)) namelist)
             (start-game (hash-ref (hash-ref (name-status) name) 'room) )))
     ((hash-table  ('type2 "getDrawStack") ('content content-json)) 

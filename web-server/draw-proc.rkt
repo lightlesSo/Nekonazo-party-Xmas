@@ -23,9 +23,9 @@
                   (begin
                     (let ((room (hash-ref (hash-ref (name-status) name) 'room)))
                     #;(hash-update! (hash-ref (room-status) room (hash)) 'drawsteps (lambda (x) (append  (reverse (car content-json)) x )) )
-                      (room-status (hash-update (room-status) room (lambda (status)
+                      ((lock-one-room room)(thunk(room-status (hash-update (room-status) room (lambda (status)
                                                                      (hash-update status 'drawsteps (lambda(steps)
-                                                                                                      (append (reverse (car content-json)) steps)))))))
+                                                                                                      (append (reverse (car content-json)) steps)))))))))
                     ;步骤是reverse保存单独
                     (broadcast-lineTo name content-json) )
                   '())))
