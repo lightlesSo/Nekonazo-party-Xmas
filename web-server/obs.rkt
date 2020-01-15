@@ -66,14 +66,14 @@ hashtable在满足条件后执行后如果变化，就执行(proc old new diflis
   (obs-hash (room-status) fun broadcast))
 (define (broadcast-room-status )
     (define rooms-namelist 
-      (filter string?
+      (filter symbol?
               (hash-map (name-status) 
                         (lambda (key value) 
                           (if (equal? "rooms" (hash-ref value 'state '()))
                               key
                               '())))))
     (define (oneroomstatus key value)
-      (make-immutable-hash (list (cons 'room key) 
+      (make-immutable-hasheq (list (cons 'room (symbol->string key) )
                        (cons 'peoplenum (length (hash-ref value 'names)))	  
                        (cons 'roomstatus (hash-ref value 'gamestate)))))
     (define roomsstatus (hash-map  (room-status) oneroomstatus))
@@ -81,7 +81,7 @@ hashtable在满足条件后执行后如果变化，就执行(proc old new diflis
     (broadcast-json rooms-namelist "room" "currentrooms" `#hasheq((roomlist . ,roomsstatus)) ))
 (define (obs fun)
   (define (obs-proc old-hash new-hash dif-list)
-    (displayln dif-list)
+    ;(displayln dif-list)
     (broadcast-room-status))
   (obs-hash root fun obs-proc))
 (provide obs)

@@ -1,7 +1,8 @@
 #lang racket
 (require net/rfc6455)
 (require json)
-(require "public-defines.rkt")
+(require "public-defines.rkt"
+         (only-in "account-proc.rkt" enter-room))
 #;(define (remove-room room)
 	"没用"
   (define rooms-namelist 
@@ -18,13 +19,15 @@
  (lock-room-status (thunk
   (if (hash-has-key? (room-status) room)
 	#f
-   (room-status (hash-set (room-status) "2" (hash 'sema (make-semaphore 1) 'names  '() 'drawsteps  '() 'gamestate "ready")))))))
+   (room-status (hash-set (room-status) room (hasheq 'sema (make-semaphore 1) 'names  '() 'drawsteps  '() 'gamestate "ready")))))))
 (define (addroom name room)
-  (newroom room))
+  (if (newroom room)
+      (enter-room name `#hasheq((room . ,(symbol->string room))))
+      (send-json name "message" "system" '#hasheq((message . "createroomfail")))))
 (define (send-current-rooms name)
 	"没用"
   (define (oneroomstatus key value)
-	  (make-immutable-hash (list (cons 'room key) 
+	  (make-immutable-hash (list (cons 'room (symbol->string key) )
 	(cons 'peoplenum (length (hash-ref value 'names)))	  
 	(cons 'roomstatus (hash-ref value 'gamestate)))))
   (define roomsstatus (hash-map  (room-status) oneroomstatus))
@@ -32,7 +35,7 @@
   (send-json name "room" "currentrooms" `#hasheq((roomlist . ,roomsstatus))))
 (define (room-proc name data)
   (match data
-	((hash-table  ('type2 "addroom") ('content content-json)) (addroom name (hash-ref content-json 'room)))
+	((hash-table  ('type2 "addroom") ('content content-json)) (addroom name (string->symbol (hash-ref content-json 'room))))
 	((hash-table  ('type2 "getcurrentrooms") ('content content-json)) (send-current-rooms name )) ;大概没用了
 	))
 (provide room-proc)

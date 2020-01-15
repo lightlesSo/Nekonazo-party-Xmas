@@ -4,7 +4,7 @@
 (require "public-defines.rkt")
 (require web-server/private/timer)
 (define (get-timelimit room drawname)
-  180)
+  18)
 
 
 (define (after-a-turn room)
@@ -24,7 +24,7 @@
   (define draw-name (hash-ref this-room-status 'drawname))
     (if (equal? guess-message nazo-word)
         (begin
-          (room-broadcast name "game" "guessright" `#hasheq((drawname . ,draw-name)(guessrightname . ,name)))
+          (room-broadcast name "game" "guessright" `#hasheq((drawname . ,(symbol->string draw-name))(guessrightname . ,(symbol->string name))))
           (after-a-turn room)
           )
         '()))
@@ -40,7 +40,7 @@
     (after-a-turn room)
     ))
 (define (set-gametimer room time-limit) 
-((lock-one-room room) (thunk 
+
   (define game-timer (start-timer
                  (start-timer-manager)
                  time-limit
@@ -48,13 +48,13 @@
                    (timeup-proc room)
                    )))
   #;(hash-set! (hash-ref (room-status) room) 'gametimer game-timer )
-  (room-status (hash-update (room-status) room (lambda (status) (hash-set status 'gametimer game-timer)))))))
+  (room-status (hash-update (room-status) room (lambda (status) (hash-set status 'gametimer game-timer)))))
 (define (send-ready name send-to)
-  (define content `#hasheq((name . ,name)(gamestate . ,(hash-ref (name->status name) 'gamestate "unknown"))))
+  (define content `#hasheq((name . ,(symbol->string name))(gamestate . ,(hash-ref (name->status name) 'gamestate "unknown"))))
   (ws-send! (name->client send-to) (jsexpr->string `#hasheq((type . "game")(type2 . "getReady")(content . ,content)))))
 
 (define (start-game room )
-(let/cc cc ((lock-one-room room) (thunk
+(if (let/cc cc ((lock-one-room room) (thunk
   (define namelist (room->namelist room ))
   (if (or (findf (lambda(name)  (equal? (hash-ref (hash-ref (name-status) name) 'gamestate) "notready"))
              namelist)
@@ -74,10 +74,10 @@
             (time-limit  (get-timelimit room drawname))
             (nazo (vector-ref nazo-words-list (random nazo-words-list-length (make-pseudo-random-generator))))
             (pubcontent `#hasheq( (timelimit . ,time-limit) ))
-            (drawcontent (hash-set* pubcontent 'gamestate  "draw" 'nazo nazo 'drawname drawname))
+            (drawcontent (hash-set* pubcontent 'gamestate  "draw" 'nazo nazo 'drawname (symbol->string drawname)))
             (guesscontent (hash-set* pubcontent 'gamestate  "guess"
                                      'nazo (hash-remove nazo 'nazo)
-                                     'drawname drawname)))
+                                     'drawname (symbol->string drawname))))
         (begin ;(hash-set! this-room-status 'gamestate "game")
                ;(hash-set! this-room-status 'nazo nazo)
                ;(hash-set! this-room-status 'drawname drawname)
@@ -88,22 +88,24 @@
                                                  'gamestate "game"
                                                  'nazo nazo
                                                  'drawname drawname
-                                                 'drawnlist new-drawn-list))))
-               ((lock-one-name drawname) (thunk(update-status! drawname 'gamestate "draw")) (unlock-one-room room cc (thunk(start-game room))))
+                                                 'drawnlist new-drawn-list))))  ;(cc (start-game room))不可行,因为要先算函数值,而那个需要锁 还没调cc没解锁
+               ((lock-one-name drawname) (thunk(update-status! drawname 'gamestate "draw"))  (thunk (cc #f)) #;(unlock-one-room room cc (thunk(start-game room))) )
                (ws-send! (name->client drawname)
                          (jsexpr->string `#hasheq((type . "game")
                                                   (type2 . "gameStart")
                                                   (content . ,drawcontent))))
                
                (map (lambda(guessname)
-                      (begin ((lock-one-name guessname) (thunk(update-status! guessname 'gamestate "guess")) (unlock-one-room room cc (thunk(start-game room))))
+                      (begin ((lock-one-name guessname) (thunk(update-status! guessname 'gamestate "guess")) (thunk (cc #f)))
                             (ws-send! (name->client guessname)
                                       (jsexpr->string `#hasheq((type . "game")
                                                                (type2 . "gameStart")
                                                                (content . ,guesscontent))))
                             ))
                     guessnames)
-               (set-gametimer room time-limit))))))))
+               (set-gametimer room time-limit)))))))
+			   (void)
+			   (start-game room)))
 (define (game-proc name data)
   (match data
     ((hash-table  ('type2 "getReady") ('content content-json))
@@ -129,7 +131,7 @@
                                                        (list (cons 'timelimit (round (/ (- (timer-expire-seconds (hash-ref this-room-status 'gametimer)) (current-inexact-milliseconds)) 1000))) 
                                                              (cons 'gamestate  "guess")
                                                              (cons 'nazo (hash-remove (hash-ref this-room-status 'nazo) 'nazo))
-                                                             (cons 'drawname (hash-ref this-room-status 'drawname))))))))
+                                                             (cons 'drawname (symbol->string (hash-ref this-room-status 'drawname)))))))))
        (ws-send! (name->client name)
                  (jsexpr->string `#hasheq((type . "draw")
                                           (type2 . "lineTo")

@@ -7,9 +7,9 @@
 ;(define (ws-pool) (make-immutable-hash))
 ;(define (name-status) (make-immutable-hash)); (name #hasheq((dsf . df)(.))
 ;(define (room-status) (make-immutable-hash)); (room #hasheq((drawsteps . df)(room . '(name name))(.))
-(define root-box (box (make-immutable-hash (list (cons 'ws-pool (make-immutable-hash))
-                                ( cons 'name-status (make-immutable-hash))
-                                (cons 'room-status (make-immutable-hash))))))
+(define root-box (box (make-immutable-hasheq (list (cons 'ws-pool (make-immutable-hasheq))
+                                ( cons 'name-status (make-immutable-hasheq))
+                                (cons 'room-status (make-immutable-hasheq))))))
 (define root
   (case-lambda (() (unbox root-box ))
                #;((new-data) (set-box! root-box new-data))));不然provide会多出不能用的功能，或者要新建一个没有更改功能的root
@@ -30,8 +30,8 @@
                ((new-data) (set-box! root-box (hash-set (root) 'name-status new-data)))
                ((k v ) (name-status (hash-set (name-status) k v)))
                ((k v fail) (name-status (hash-set (name-status) k v fail)))))
-(room-status (hash-set (room-status) "1" (hash 'sema (make-semaphore 1) 'names  '() 'drawsteps  '() 'gamestate "ready"))) ;;测试用
-(room-status (hash-set (room-status) "2" (hash 'sema (make-semaphore 1) 'names  '() 'drawsteps  '() 'gamestate "ready")))
+(room-status (hash-set (room-status) (string->symbol "1") (hasheq 'sema (make-semaphore 1) 'names  '() 'drawsteps  '() 'gamestate "ready"))) ;;测试用
+(room-status (hash-set (room-status) (string->symbol "2") (hasheq 'sema (make-semaphore 1) 'names  '() 'drawsteps  '() 'gamestate "ready")))
 (define ws-pool-sema (make-semaphore 1) )
 (define name-status-sema (make-semaphore 1) )
 (define room-status-sema (make-semaphore 1) )
@@ -52,13 +52,13 @@
 "用法 ((lock-one-room "1") (thunk))"
 (lock-sema (hash-ref (hash-ref (room-status) room) 'sema)))
 (define (unlock-one-room room cc proc) 
-"(unlock-one-room room cc (thunk (start room)))"
-(thunk (begin (semaphore-post (hash-ref (hash-ref (room-status) room) 'sema)) (cc (proc)))))
+"(unlock-one-room room cc (thunk (start room))) 不需要自己增加 跳出时就会加了"
+(thunk (begin #;(semaphore-post (hash-ref (hash-ref (room-status) room) 'sema)) (cc (proc)))))
 (define (lock-one-name name)
 (lock-sema (hash-ref (hash-ref (name-status) name) 'sema)))  
 (define (unlock-one-name name cc proc) 
 
-(thunk (begin (semaphore-post (hash-ref (hash-ref (name-status) name) 'sema)) (cc (proc)))))
+(thunk (begin #;(semaphore-post (hash-ref (hash-ref (name-status) name) 'sema)) (cc (proc)))))
 (define (name->sema name) 
 (hash-ref (hash-ref (name-status) name) 'sema))
 (define (room->sema room) 
@@ -76,7 +76,7 @@
       (hash-ref (hash-ref (room-status) room (make-hash)) 'names fail)))
 (define room->namelist
   (case-lambda ((room)(hash-ref (hash-ref (room-status) room ) 'names ))
-               ((room fail) (hash-ref (hash-ref (room-status) room (hash)) 'names fail))))
+               ((room fail) (hash-ref (hash-ref (room-status) room (hasheq)) 'names fail))))
 #;(define (name->status name (fail "meiyou"))
   (if (equal? fail "meiyou")
       (hash-ref (name-status) name)
@@ -106,7 +106,7 @@
                               name
                               (lambda (status)                             
                                   (hash-set status key value ))
-                              (hash))))))
+                              (hasheq))))))
 (define update-room-status!
   (case-lambda ((room key value)
                 (room-status
@@ -114,7 +114,7 @@
                               room
                               (lambda (status)                             
                                   (hash-set status key value ))
-                              (hash))))))
+                              (hasheq))))))
 #;(define (room->roomstatus room (fail "meiyou"))
   "似乎根本没用上"
   (if (equal? fail "meiyou")
@@ -162,7 +162,7 @@
          (room-status room new-room-status))))) ;因为前面用了this-room-status 单独把new-room-status转换成(new-room-status)不行
 (define (send-current-rooms name)
   (define (oneroomstatus key value)
-    (make-immutable-hash (list (cons 'room key) 
+    (make-immutable-hasheq (list (cons 'room (symbol->string key) )
                      (cons 'peoplenum (length (hash-ref value 'names)))	  
                      (cons 'roomstatus (hash-ref value 'gamestate)))))
   (define roomsstatus (hash-map  (room-status) oneroomstatus))

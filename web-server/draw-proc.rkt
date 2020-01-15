@@ -16,16 +16,19 @@
          (hash-update! (hash-ref (room-status) (hash-ref (hash-ref (name-status) name) 'room) (hash)) 'drawsteps (lambda (x) (append x (car content-json) )) #;'())
          (broadcast-lineTo name content-json) ))
       )
+	;  (displayln data)
   (define content-json (hash-ref data 'content))
   (define type2 (hash-ref data 'type2))
+	
   (case type2
     (("lineTo") (if (and (equal? (hash-ref (hash-ref (name-status) name) 'state) "room") (equal? (hash-ref (hash-ref (name-status) name) 'gamestate) "draw"))
                   (begin
                     (let ((room (hash-ref (hash-ref (name-status) name) 'room)))
                     #;(hash-update! (hash-ref (room-status) room (hash)) 'drawsteps (lambda (x) (append  (reverse (car content-json)) x )) )
+					;(display room)
                       ((lock-one-room room)(thunk(room-status (hash-update (room-status) room (lambda (status)
                                                                      (hash-update status 'drawsteps (lambda(steps)
-                                                                                                      (append (reverse (car content-json)) steps)))))))))
+                                                                                                      (append (car content-json) steps)))))))))
                     ;步骤是reverse保存单独
                     (broadcast-lineTo name content-json) )
                   '())))

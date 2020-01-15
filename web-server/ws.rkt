@@ -25,6 +25,7 @@
          #:port static-port))
 
 (define (proc client params)
+"name 为 symbol room为 symbol 接收和发送时转换"
   (define name (extract-binding/single 'name params))
   (let/cc close
     (let loop ((private-status (list ))) 
@@ -55,12 +56,12 @@
   (if (not (equal? origin host))       
                
       (begin (ws-send! client (jsexpr->string
-                               `#hasheqeq((type . "account")
+                               `#hasheq((type . "account")
                                         (type2 . "login")
                                         (content . #hasheqeq((name . "origin-problem")
                                                            (status . "not-same-origin"))))))
              (ws-close! client ))
-      (let ((name (login client `#hasheqeq((name . ,username)))))
+      (let ((name (login client `#hasheq((name . ,username)))))
         (if (void? name)
             '()
             (proc client (list (cons 'name name)))))))

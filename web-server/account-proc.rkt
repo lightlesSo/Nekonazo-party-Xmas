@@ -4,7 +4,7 @@
 (require "public-defines.rkt")
 (define (enter-room  name content)
 	
-  (define room-id (hash-ref content 'room ))
+  (define room-id  (string->symbol (hash-ref content 'room )))
   (semaphore-wait (hash-ref (hash-ref (room-status) room-id) 'sema))
   (define in-room (room->namelist room-id '()))
   (define room-game-state (with-handlers ((exn:fail? (lambda(e) #f)))(hash-ref (hash-ref (room-status) room-id) 'gamestate)))  
@@ -36,10 +36,10 @@
           (ws-send! (name->client name) (jsexpr->string
                                          `#hasheq((type . "account")
                                                   (type2 . "enterRoom")
-                                                  (content . #hasheq((room . ,room-id)
+                                                  (content . #hasheq((room . ,(symbol->string room-id))
                                                                      (status . "ok")
                                                                      (roomgamestate . ,room-game-state)
-                                                                     (characters . ,in-room))))))
+                                                                     (characters . ,(map symbol->string in-room)))))))
           (one-in-out-room name in-room)))))
 (define (one-in-out-room name others) 
   (define state (hash-ref (name->status name) 'state))
@@ -48,7 +48,7 @@
     (ws-send! (name->client to) (jsexpr->string
                                  `#hasheq((type . "account")
                                           (type2 . "inoutroom") 
-                                          (content . #hasheq((name . ,from)
+                                          (content . #hasheq((name . ,(symbol->string from))
                                                              (gamestate . ,gamestate)
                                                              (state . ,state)))))))
   (map (lambda(x)(send-message name x)) others))
@@ -75,4 +75,4 @@
     ((hash-table  ('type2 "exitRoom") ('content content)) #:when(equal? (hash-ref (hash-ref (name-status) name) 'state) "room")
      (exit-room  name  content))
     ))
-(provide account-proc exit-room)
+(provide account-proc exit-room enter-room)

@@ -333,30 +333,7 @@ function flash(name){
 		document.getElementById("flash").style.display="block";
 		document.getElementById("bgmusic").pause();
 		
-		let inputBox=document.getElementById("input-box");
-		inputBox.onsubmit=function(e){
-			let sendingMessage= e.target["input-text"].value;
-			let content={};
-			if(state="room"){
-				e.target["input-text"].value="";
-				switch(gameState){
-					case "guess":
-						content={
-							message:sendingMessage
-						};
-						ws.send(JSON.stringify({"type":"message","type2":"guess","content":content}));
-					break;
-					case "draw":
-					case "ready":
-					case "notready":
-						content={
-							message:sendingMessage
-						};
-						ws.send(JSON.stringify({"type":"message","type2":"room","content":content}));
-					break;
-				}
-			}
-		}
+
 		if(undefined===pen){
 			pen=Palette.palette(document.getElementById("palette"),document.getElementById("brushs"),function(newStyles){
 				pen.setCtx(ctx);
@@ -398,21 +375,47 @@ function flash(name){
 			let getReady={"type":"game","type2":"getReady","content":{/*"room":room*/}};
 			ws.send(JSON.stringify(getReady));
 		}
-		document.getElementById(nameToId(name)).onclick=function(e){
-			if(state==="room"&&gameState!=="draw"&&gameState!=="guess" ){
-				if(document.getElementById(nameToId(name)).classList.contains("ready")){
-					let setReady={"type":"game","type2":"setReady","content":{"gamestate":"notready",/*"room":room,*/"name":name}};
-					ws.send(JSON.stringify(setReady));
-				}
-				else{
-					let setReady={"type":"game","type2":"setReady","content":{"gamestate":"ready",/*"room":room,*/"name":name}};
-					ws.send(JSON.stringify(setReady));
+		let inputBox=document.getElementById("input-box");
+		if (inputBox.onsubmit===null){
+			inputBox.onsubmit=function(e){
+				let sendingMessage= e.target["input-text"].value;
+				let content={};
+				if(state="room"){
+					e.target["input-text"].value="";
+					switch(gameState){
+						case "guess":
+							content={
+								message:sendingMessage
+							};
+							ws.send(JSON.stringify({"type":"message","type2":"guess","content":content}));
+						break;
+						case "draw":
+						case "ready":
+						case "notready":
+							content={
+								message:sendingMessage
+							};
+							ws.send(JSON.stringify({"type":"message","type2":"room","content":content}));
+						break;
+					}
 				}
 			}
-		};
-		document.getElementById("exitroom").onclick=function(e){
-			let exitRoom={"type":"account","type2":"exitRoom","content":{"room":room,"name":name}};
-			ws.send(JSON.stringify(exitRoom));
+			document.getElementById(nameToId(name)).onclick=function(e){
+				if(state==="room"&&gameState!=="draw"&&gameState!=="guess" ){
+					if(document.getElementById(nameToId(name)).classList.contains("ready")){
+						let setReady={"type":"game","type2":"setReady","content":{"gamestate":"notready",/*"room":room,*/"name":name}};
+						ws.send(JSON.stringify(setReady));
+					}
+					else{
+						let setReady={"type":"game","type2":"setReady","content":{"gamestate":"ready",/*"room":room,*/"name":name}};
+						ws.send(JSON.stringify(setReady));
+					}
+				}
+			};
+			document.getElementById("exitroom").onclick=function(e){
+				let exitRoom={"type":"account","type2":"exitRoom","content":{"room":room,"name":name}};
+				ws.send(JSON.stringify(exitRoom));
+			}
 		}
 	}
 
@@ -495,67 +498,76 @@ function flash(name){
 		document.getElementById("bgmusic").play();
 		snow(document.getElementById("snow"));
 		let sixRooms=document.getElementById("six-rooms");
-		sixRooms.onclick=function(e){
-			if(e.target.classList.contains("room")){
-				let roomId=idToRoom(e.target.id);
-				let enterRoom={"type":"account","type2":"enterRoom","content":{"room":roomId}};
-				ws.send(JSON.stringify(enterRoom));
+		if(sixRooms.onclick===null){
+			sixRooms.onclick=function(e){
+				if(e.target.classList.contains("room")){
+					let roomId=idToRoom(e.target.id);
+					let enterRoom={"type":"account","type2":"enterRoom","content":{"room":roomId}};
+					ws.send(JSON.stringify(enterRoom));
+				}
+			}	
+			document.getElementById("room-999").onclick=function(e){	
+				
+		//		document.getElementById("login").style.display="none";
+				document.getElementById("rooms").style.display="none";
+				document.getElementById("flash").style.display="block";
+				document.getElementById("bgmusic").pause();
+				if(undefined===pen){
+					pen=Palette.palette(document.getElementById("palette"),document.getElementById("brushs"),function(newStyles){
+						pen.setCtx(ctx);
+					},DRAW_PILES);
+				}
+				initTurn();
+				realboard[onDown]=drawListener;
+				document.getElementById("drawTimeLimit").style.display="none";				
+				document.getElementById("draw-tool").style.display="block";				
+				//pen.setCtxPressure(ctx,{});
+				[canvas.style.width,canvas.style.height]=
+				[realboard.offsetWidth*2,realboard.offsetHeight*2].map(x=>Math.floor(x));
+				state="room";
+				canvasStack.push(ctx.getImageData(0,0,canvasWidth,canvasHeight));
+				document.getElementById("exitroom").onclick=function(e){
+					toRooms();
+				}
 			}
-		}	
-		document.getElementById("room-999").onclick=function(e){	
-			
-	//		document.getElementById("login").style.display="none";
-			document.getElementById("rooms").style.display="none";
-			document.getElementById("flash").style.display="block";
-			document.getElementById("bgmusic").pause();
-			if(undefined===pen){
-				pen=Palette.palette(document.getElementById("palette"),document.getElementById("brushs"),function(newStyles){
-					pen.setCtx(ctx);
-				},DRAW_PILES);
+			function createRoom(e){
+				let newRoomName=getNewRoomName();
+				let addroom={type:"room",type2:"addroom",content:{room:newRoomName}};
+				ws.send(JSON.stringify(addroom));
+				let timeout=WAIT_TIMEOUT;
+				//this.onclick=null;
+				this.style.pointerEvents="none";
+				sixRooms.style.pointerEvents="none";
+				document.getElementById("room-999").style.pointerEvents="none";
+				let button=this;
+			//	getCurrentRoomsOnce(500);
+				function proc(){
+					timeout=timeout-100;
+					if(timeout<0||state!=="rooms"){
+						button.style.pointerEvents="auto";
+						sixRooms.style.pointerEvents="auto";
+						document.getElementById("room-999").style.pointerEvents="auto";
+						return;
+					}
+					/*
+					let newRoom=document.getElementById(roomToId(newRoomName));
+					if(newRoom===null){
+						setTimeout(proc,100);
+					}
+					else if(state==="rooms"){
+						button.style.pointerEvents="auto";
+						sixRooms.style.pointerEvents="auto";
+						newRoom.click();
+					}
+					*/
+					else {
+						setTimeout(proc,100);
+					}
+				}
+				proc();
 			}
-			initTurn();
-			realboard[onDown]=drawListener;
-			document.getElementById("drawTimeLimit").style.display="none";				
-			document.getElementById("draw-tool").style.display="block";				
-			//pen.setCtxPressure(ctx,{});
-			[canvas.style.width,canvas.style.height]=
-			[realboard.offsetWidth*2,realboard.offsetHeight*2].map(x=>Math.floor(x));
-			state="room";
-			canvasStack.push(ctx.getImageData(0,0,canvasWidth,canvasHeight));
-			document.getElementById("exitroom").onclick=function(e){
-				toRooms();
-			}
+			document.getElementById("create-room").onclick=createRoom;
 		}
-		function createRoom(e){
-			let newRoomName=getNewRoomName();
-			let addroom={type:"room",type2:"addroom",content:{room:newRoomName}};
-			ws.send(JSON.stringify(addroom));
-			let timeout=WAIT_TIMEOUT;
-			//this.onclick=null;
-			this.style.pointerEvents="none";
-			sixRooms.style.pointerEvents="none";
-			let button=this;
-		//	getCurrentRoomsOnce(500);
-			function proc(){
-				timeout=timeout-100;
-				if(timeout<0){
-					button.style.pointerEvents="auto";
-					sixRooms.style.pointerEvents="auto";
-					return;
-				}
-				let newRoom=document.getElementById(roomToId(newRoomName));
-				if(newRoom===null){
-					setTimeout(proc,100);
-				}
-				else if(state==="rooms"){
-					button.style.pointerEvents="auto";
-					sixRooms.style.pointerEvents="auto";
-					newRoom.click();
-				}
-			}
-			proc();
-		}
-		document.getElementById("create-room").onclick=createRoom;
 		//getCurrentRooms();
 		getCurrentRoomsOnce();
 	}
@@ -838,6 +850,9 @@ function flash(name){
 			modifyRoom.firstElementChild.dataset.roomstatus=content.roomstatus.toUpperCase();
 		}
 	}
+	function systemMessage(content){
+		alert(content.message);
+	}
 	function WebSocketTest(name,port){
 		ws = new WebSocket(`${PROTOCOL}://${window.location.hostname}:${port}/?username=${name}`)//;  正式版    
 	    ws.onopen = function(evt){
@@ -909,6 +924,9 @@ function flash(name){
 						break;
 						case "room":
 							reciveRoomMessage(rec.content);
+						break;
+						case "system":
+							systemMessage(rec.content);
 						break;
 					}
 				break;
