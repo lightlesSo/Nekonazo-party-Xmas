@@ -5,6 +5,7 @@
 (define not-obs-keys (list 'drawsteps 'sema))
 
 (define (diff-hash old-hash new-hash #:add-sign (add '+) #:remove-sign (remove '-) #:modify-sign (modify '$))
+    "返回值 '( (key1 (key13 ($ . key131) (+ . key134))) (key2 (- . key23)))  or '()"
   (define (diff old new change)
     (if (hash-empty? old)
         (append (map (lambda (k) (cons add k)) (hash-keys new))  change)
